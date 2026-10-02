@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confidentialité — Odyssey</title>
+<meta name="description" content="Politique de confidentialité de l'application Odyssey.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap');
+  :root{
+    --ink:#12172b; --paper:#f4f6fb; --line:rgba(18,23,43,0.12);
+    --deep:#023e8a; --violet:#46398a; --sun:#f2a93b; --card-bg:#ffffff; --muted:#565f82;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#eef0f9; --paper:#0a0e1f; --line:rgba(238,240,249,0.14); --card-bg:#11162c; --muted:#9aa3c7;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ink:#eef0f9; --paper:#0a0e1f; --line:rgba(238,240,249,0.14); --card-bg:#11162c; --muted:#9aa3c7;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Manrope',ui-sans-serif,system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  header{background:linear-gradient(135deg,var(--deep) 0%,var(--violet) 100%);color:#fff;padding:2.4rem 1rem 2.6rem;}
+  header .wrap{max-width:760px;margin:0 auto;}
+  header a{color:rgba(255,255,255,0.8);text-decoration:none;font-weight:600;font-size:0.9rem;}
+  h1,h2{font-family:'Poppins',ui-sans-serif,system-ui,sans-serif;text-wrap:balance;}
+  h1{margin:1.2rem 0 0.4rem;font-size:clamp(1.7rem,5vw,2.4rem);}
+  header p{margin:0;color:rgba(255,255,255,0.78);}
+  main{max-width:760px;margin:0 auto;padding:2rem 1rem 4rem;}
+  section{background:var(--card-bg);border:1px solid var(--line);border-radius:16px;padding:1.4rem 1.4rem 0.6rem;margin-bottom:1rem;}
+  h2{font-size:1.15rem;margin:0 0 0.7rem;}
+  ul{padding-left:1.2rem;margin:0 0 1rem;}
+  li{margin-bottom:0.45rem;}
+  p{margin:0 0 1rem;}
+  .muted{color:var(--muted);font-size:0.9rem;}
+  a{color:inherit;}
+  table{width:100%;border-collapse:collapse;margin:0 0 1rem;font-size:0.92rem;}
+  th,td{text-align:left;vertical-align:top;padding:0.55rem 0.5rem;border-top:1px solid var(--line);}
+  th{font-weight:700;}
+  .table-wrap{overflow-x:auto;}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <a href="./">← Odyssey</a>
+    <h1>Politique de confidentialité</h1>
+    <p>Dernière mise à jour : 2 octobre 2026</p>
+  </div>
+</header>
+<main>
+  <section>
+    <h2>Qui sommes-nous</h2>
+    <p>Odyssey est une application de préparation et d'accompagnement de voyage développée par l'équipe étudiante Odyssey-EIP (projet EIP, EPITECH). Elle est responsable des données traitées par l'application.</p>
+    <p>Contact : <a href="mailto:odyssey.eip@gmail.com">odyssey.eip@gmail.com</a></p>
+  </section>
+
+  <section>
+    <h2>Les données que nous collectons</h2>
+    <div class="table-wrap">
+    <table>
+      <tr><th>Donnée</th><th>Pourquoi</th></tr>
+      <tr><td>Prénom, nom, nom d'utilisateur, e-mail, date de naissance, mot de passe (stocké chiffré)</td><td>Créer et sécuriser votre compte</td></tr>
+      <tr><td>Nationalité, passeports, lieu de résidence</td><td>Adapter les itinéraires (visas, point de départ des vols)</td></tr>
+      <tr><td>Régime alimentaire, allergies, besoins d'accessibilité, alertes médicales, permis de conduire</td><td>Ne proposer que des activités compatibles avec vos besoins. Ces informations sont facultatives.</td></tr>
+      <tr><td>Profil de voyageur, compagnons de voyage (âge, besoins), messages échangés avec Ody</td><td>Générer et ajuster vos itinéraires</td></tr>
+      <tr><td>Position GPS précise, uniquement pendant un voyage dont vous avez activé le suivi</td><td>Suivre votre progression, détecter un écart d'itinéraire, proposer des lieux proches et construire le récapitulatif du voyage</td></tr>
+      <tr><td>Enregistrements vocaux lors d'un appel avec Ody</td><td>Transcrire votre voix en texte. L'audio n'est pas conservé après la transcription.</td></tr>
+    </table>
+    </div>
+    <p><strong>Traité uniquement sur votre téléphone :</strong> les photos de votre galerie (pour le récapitulatif de voyage) et l'image de la caméra pendant un appel. Elles ne sont jamais envoyées à nos serveurs. Une image du récapitulatif n'est partagée que si vous appuyez vous-même sur « Partager ».</p>
+    <p>Odyssey n'intègre aucun outil publicitaire ni de mesure d'audience. Vos données ne sont ni vendues ni utilisées à des fins publicitaires.</p>
+  </section>
+
+  <section>
+    <h2>Autorisations du téléphone</h2>
+    <ul>
+      <li><strong>Localisation</strong> : demandée quand vous démarrez le suivi d'un voyage. Écran éteint, le suivi passe par une notification permanente, que vous pouvez arrêter à tout moment.</li>
+      <li><strong>Micro</strong> : utilisé seulement pendant un appel vocal avec Ody.</li>
+      <li><strong>Caméra</strong> : aperçu facultatif pendant un appel, jamais enregistré ni transmis.</li>
+      <li><strong>Photos</strong> : lues sur l'appareil pour retrouver les photos prises pendant le voyage.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Avec qui ces données sont partagées</h2>
+    <p>Uniquement avec les prestataires nécessaires au fonctionnement du service :</p>
+    <ul>
+      <li><strong>OpenAI</strong> : génération des itinéraires, conversation avec Ody et transcription vocale. Les demandes contiennent les informations utiles à votre voyage, y compris vos préférences et besoins.</li>
+      <li><strong>Google Maps Platform</strong> : recherche de lieux, trajets, fuseaux horaires. Pour les suggestions à proximité, une position arrondie à environ 100 m est transmise.</li>
+      <li><strong>Amadeus</strong> : recherche de vols et d'hébergements (ville de départ, dates, nombre de voyageurs).</li>
+      <li><strong>Open-Meteo, OpenStreetMap, Wikipédia, Unsplash</strong> : météo, cartes et images de la destination. Seules des coordonnées ou des noms de lieux leur sont transmis.</li>
+      <li><strong>Supabase et Microsoft Azure</strong> : hébergement de la base de données et du serveur.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Sécurité et conservation</h2>
+    <ul>
+      <li>Les échanges entre l'application et nos serveurs sont chiffrés (HTTPS).</li>
+      <li>Sur le téléphone, vos jetons de connexion sont gardés dans le stockage sécurisé du système.</li>
+      <li>Les données de compte, de profil et de voyage sont conservées tant que votre compte existe.</li>
+      <li>Vous pouvez effacer à tout moment le tracé GPS d'un voyage, vos conversations ou un itinéraire.</li>
+    </ul>
+  </section>
+
+  <section id="suppression">
+    <h2>Supprimer votre compte et vos données</h2>
+    <p>Dans l'application : <strong>Paramètres → Supprimer mon compte</strong>. Votre compte et les données associées (profil, voyages, tracés, conversations) sont supprimés.</p>
+    <p>Sans l'application : écrivez à <a href="mailto:odyssey.eip@gmail.com?subject=Suppression%20de%20compte%20Odyssey">odyssey.eip@gmail.com</a> depuis l'adresse de votre compte, avec l'objet « Suppression de compte ». Nous supprimons le compte et ses données sous 30 jours.</p>
+  </section>
+
+  <section>
+    <h2>Vos droits</h2>
+    <p>Conformément au RGPD, vous pouvez accéder à vos données, les corriger, les exporter, les supprimer ou retirer votre consentement pour les informations facultatives, en nous écrivant à l'adresse ci-dessus. Vous pouvez aussi adresser une réclamation à la CNIL (cnil.fr).</p>
+    <p class="muted">Odyssey ne s'adresse pas aux enfants de moins de 13 ans.</p>
+  </section>
+</main>
+</body>
+</html>
