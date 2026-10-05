@@ -1,6 +1,7 @@
 // Mouvement de la page d'accueil, sans bibliothèque :
 // - titres qui montent mot par mot, blocs qui apparaissent au défilement ;
-// - parallaxe des photos, téléphones qui s'écartent en entrant ;
+// - parallaxe des photos ; éventail de sept téléphones, épinglé sur grand
+//   écran, qui s'ouvre l'un après l'autre puis prend de la profondeur ;
 // - bandeau de destinations qui glisse, piste « Comment ça marche »
 //   épinglée et déroulée à l'horizontale pendant le défilement ;
 // - rangée du récap qui défile à l'horizontale pendant qu'elle est à l'écran ;
@@ -92,6 +93,51 @@
   var slide = document.querySelector('[data-slide]');
   var slideTrack = slide && slide.querySelector('[data-slide-track]');
   var linked = false, slideDist = 0;
+
+  // ---------- Éventail du projet ----------
+  // p (0 → 1) : les téléphones quittent la pile, du centre vers les bords
+  // (FAN premiers pourcents), puis la profondeur s'installe et la photo
+  // s'approche. Épinglé dès 900 px, sinon lié à l'entrée dans l'écran.
+  var stagePin = document.querySelector('[data-stage-pin]');
+  var stagePhones = stage && stage.querySelector('.phones');
+  var stagePhoto = stage && stage.querySelector('[data-stage-photo]');
+  var slots = stage ? Array.prototype.slice.call(stage.querySelectorAll('[data-slot]')) : [];
+  var stagePinned = false, stageLast = -1;
+  var FAN = 0.62, STAGGER = 0.13;
+
+  function easeOut(k){ return 1 - (1 - k) * (1 - k) * (1 - k); }
+
+  function renderStage(p){
+    p = Math.round(p * 1000) / 1000;
+    if (p === stageLast) return;
+    stageLast = p;
+    var f = clamp(p / FAN), span = 1 - 3 * STAGGER, mid = (slots.length - 1) / 2;
+    slots.forEach(function(s, n){
+      var a = Math.abs(n - mid);
+      s.style.setProperty('--k', easeOut(clamp((f - a * STAGGER) / span)).toFixed(4));
+    });
+    var d = smooth(clamp((p - FAN) / (1 - FAN)));
+    stagePhones.style.setProperty('--d', d.toFixed(4));
+    stagePhoto.style.transform = 'scale(' + (1 + 0.08 * d).toFixed(4) + ')';
+  }
+
+  function stageProgress(vh){
+    if (stagePinned){
+      // Démarre un peu avant l'épinglage, pendant que la scène entre.
+      var lead = vh * 0.25;
+      var wr = stagePin.getBoundingClientRect();
+      return clamp((lead - wr.top) / Math.max(1, stagePin.offsetHeight - vh + lead));
+    }
+    var sr = stage.getBoundingClientRect();
+    return clamp((vh - sr.bottom + sr.height * 0.75) / (sr.height * 0.75 + vh * 0.5));
+  }
+
+  function layoutStage(){
+    if (!stagePin || !motion || !slots.length) return;
+    stagePinned = window.innerWidth >= 900;
+    stagePin.classList.toggle('is-pinned', stagePinned);
+    stageLast = -1;
+  }
 
   // ---------- Pendant le voyage ----------
   // p (0 → 1) raconte la scène : marche sur le plan jusqu'à la ruelle,
@@ -200,6 +246,7 @@
   // Épingle la piste sur grand écran : la section devient aussi haute
   // que la distance horizontale à parcourir.
   function layout(){
+    layoutStage();
     layoutSlide();
     layoutTrip();
     if (!how) return;
@@ -257,9 +304,11 @@
       el.style.transform = 'translate3d(0,' + (-offset * parseFloat(el.getAttribute('data-parallax'))).toFixed(1) + 'px,0)';
     });
 
-    if (stage){
+    if (stage && slots.length){
       var sr = stage.getBoundingClientRect();
-      stage.style.setProperty('--p', clamp((vh - sr.top) / (vh * 0.8)).toFixed(3));
+      var near = sr.bottom > -80 && sr.top < vh + 80;
+      stage.classList.toggle('is-near', near);
+      if (near) renderStage(stageProgress(vh));
     }
 
     // La rangée parcourt toute sa largeur pendant qu'elle est entièrement

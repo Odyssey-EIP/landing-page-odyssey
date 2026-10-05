@@ -185,17 +185,37 @@ p{margin:0;}
 .iphone-status::after{content:"";width:calc(var(--w) * .2);height:calc(var(--w) * .034);background:currentColor;-webkit-mask:var(--status-icons) no-repeat center/contain;mask:var(--status-icons) no-repeat center/contain;}
 :root{--status-icons:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 78 13'%3E%3Crect x='0' y='8' width='3.2' height='4.4' rx='.9'/%3E%3Crect x='4.8' y='5.8' width='3.2' height='6.6' rx='.9'/%3E%3Crect x='9.6' y='3.4' width='3.2' height='9' rx='.9'/%3E%3Crect x='14.4' y='1' width='3.2' height='11.4' rx='.9'/%3E%3Cpath d='M23.6 4.9a10.4 10.4 0 0 1 14.8 0M26.4 7.8a6.4 6.4 0 0 1 9.2 0' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round'/%3E%3Ccircle cx='31' cy='10.9' r='1.7'/%3E%3Crect x='46.6' y='1' width='24.4' height='11.4' rx='3.4' fill='none' stroke='%23000' stroke-opacity='.4' stroke-width='1.1'/%3E%3Crect x='48.6' y='3' width='17.6' height='7.4' rx='1.8'/%3E%3Crect x='72.4' y='4.6' width='1.7' height='4.2' rx='.85' fill-opacity='.45'/%3E%3C/svg%3E");}
 
-/* Scène : les téléphones posés sur un paysage, comme l'affiche.
-   --p (0 → 1) suit le défilement : les téléphones s'écartent en entrant. */
-.stage{--p:1;position:relative;height:min(92vh,820px);min-height:560px;overflow:hidden;background:var(--night);}
+/* Scène : sept téléphones en éventail sur un paysage, comme l'affiche.
+   Chaque .slot place un téléphone dans l'arc (--x, --y en largeurs de
+   téléphone, --r, --s). --k (0 → 1, posé par motion.js) va de « empilé
+   derrière le central, bas et droit » à cette place ; --d (0 → 1) ajoute
+   ensuite la profondeur : les téléphones extérieurs dérivent davantage.
+   Sans mouvement : --k = 1, --d = 0, l'éventail final. */
+.stage-pin{position:relative;}
+.stage-pin.is-pinned{height:220vh;}
+.stage-pin.is-pinned .stage{position:sticky;top:0;height:100vh;min-height:0;}
+.stage{position:relative;height:min(92vh,820px);min-height:560px;overflow:hidden;background:var(--night);}
 .stage-media{position:absolute;inset:-12% 0;will-change:transform;}
-.stage-media img{width:100%;height:100%;object-fit:cover;}
+.stage-media img{width:100%;height:100%;object-fit:cover;transform-origin:50% 55%;}
 .stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,11,24,0) 45%,var(--scrim) 100%);pointer-events:none;}
-.phones{position:absolute;z-index:1;left:50%;bottom:0;display:flex;align-items:flex-end;transform:translateX(-50%);}
-.phones .iphone:nth-child(1){transform:translate(calc(190px - 150px * var(--p)),calc(40px - 70px * var(--p))) rotate(calc(-8deg * var(--p)));}
-.phones .iphone:nth-child(2){z-index:1;--w:290px;transform:translateY(calc(220px - 160px * var(--p)));}
-.phones .iphone:nth-child(3){transform:translate(calc(-190px + 150px * var(--p)),calc(40px - 70px * var(--p))) rotate(calc(8deg * var(--p)));}
-.stage-caption{position:absolute;z-index:2;left:32px;bottom:28px;color:var(--on-photo-soft);font-size:.8rem;font-weight:600;letter-spacing:.04em;}
+.phones{--pw:min(290px,33vh);--spread:1;--d:0;position:absolute;z-index:1;left:50%;bottom:0;width:0;height:0;transform-origin:0 100%;}
+.slot{--k:1;--x:0;--y:.2;--r:0deg;--s:1;position:absolute;left:0;bottom:0;z-index:4;transform-origin:50% 100%;
+  transform:
+    translate(calc(-50% + var(--pw) * (var(--x) * var(--spread) * var(--k) + var(--i) * var(--d) * .03)),
+              calc(var(--pw) * (.8 + (var(--y) - .8) * var(--k) - var(--a) * var(--d) * .05)))
+    rotate(calc(var(--r) * var(--k)))
+    scale(calc(1 + (var(--s) - 1) * var(--k)));}
+.slot .iphone{--w:var(--pw);}
+.slot:nth-child(3),.slot:nth-child(5){z-index:3;--y:.25;--s:.86;}
+.slot:nth-child(2),.slot:nth-child(6){z-index:2;--y:.33;--s:.74;}
+.slot:nth-child(1),.slot:nth-child(7){z-index:1;--y:.45;--s:.63;}
+.slot:nth-child(3){--x:-.76;--r:-5deg;}
+.slot:nth-child(5){--x:.76;--r:5deg;}
+.slot:nth-child(2){--x:-1.36;--r:-10deg;}
+.slot:nth-child(6){--x:1.36;--r:10deg;}
+.slot:nth-child(1){--x:-1.86;--r:-15deg;}
+.slot:nth-child(7){--x:1.86;--r:15deg;}
+.stage-caption{position:absolute;z-index:2;left:32px;top:28px;margin:0;color:var(--on-photo-soft);font-size:.8rem;font-weight:600;letter-spacing:.04em;}
 
 .manifesto{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:64px;margin-top:120px;}
 .manifesto .lead{font-family:var(--font-head);font-weight:500;font-size:clamp(1.5rem,3vw,2.5rem);line-height:1.22;letter-spacing:-0.025em;}
@@ -458,6 +478,18 @@ p{margin:0;}
 .motion .split.is-in .w > span{transform:none;}
 .motion .clip{clip-path:inset(14% 10% 14% 10%);transition:clip-path 1.5s var(--ease);}
 .motion .clip.is-in{clip-path:inset(0 0 0 0);}
+/* Éventail : léger flottement de chaque téléphone, sur l'.iphone pour ne pas
+   se battre avec la transformation du .slot ; en pause hors de l'écran. */
+.motion .slot{will-change:transform;}
+.motion .slot .iphone{animation:stage-float 6.4s ease-in-out infinite alternate;}
+.motion .slot:nth-child(1) .iphone{animation-duration:7.2s;animation-delay:-2.1s;}
+.motion .slot:nth-child(2) .iphone{animation-duration:5.8s;animation-delay:-4.3s;}
+.motion .slot:nth-child(3) .iphone{animation-duration:6.9s;animation-delay:-1.2s;}
+.motion .slot:nth-child(5) .iphone{animation-duration:6.1s;animation-delay:-3.4s;}
+.motion .slot:nth-child(6) .iphone{animation-duration:7.6s;animation-delay:-.6s;}
+.motion .slot:nth-child(7) .iphone{animation-duration:5.5s;animation-delay:-2.8s;}
+.motion .stage:not(.is-near) .slot .iphone{animation-play-state:paused;}
+@keyframes stage-float{from{transform:translateY(0);}to{transform:translateY(calc(var(--pw) * -.04));}}
 .motion .line-in{transform:scaleX(0);transform-origin:left;transition:transform 1.4s var(--ease);}
 .motion .line-in.is-in{transform:none;}
 .motion .hero-bg{animation:hero-zoom 2.6s var(--ease) both;}
@@ -466,7 +498,11 @@ p{margin:0;}
 .motion .hero.is-in .hero-row{opacity:1;transform:none;}
 
 /* ---------- Responsive ---------- */
+@media (max-width: 1240px){
+  .phones{transform:scale(.88);}
+}
 @media (max-width: 1080px){
+  .phones{--spread:.86;}
   .nav-links{display:none;}
   .sec-grid,.beta-grid,.manifesto{grid-template-columns:1fr;gap:28px;}
   .footer-grid{grid-template-columns:1fr 1fr;}
@@ -483,11 +519,8 @@ p{margin:0;}
   .hero-row{grid-template-columns:1fr;gap:24px;}
   .hero-body{padding-bottom:32px;}
   .stage{height:600px;min-height:0;}
-  .phones .iphone{--w:168px;}
-  .phones .iphone:nth-child(1){transform:translate(calc(140px - 80px * var(--p)),calc(30px - 40px * var(--p))) rotate(calc(-8deg * var(--p)));}
-  .phones .iphone:nth-child(2){--w:196px;transform:translateY(calc(160px - 120px * var(--p)));}
-  .phones .iphone:nth-child(3){transform:translate(calc(-140px + 80px * var(--p)),calc(30px - 40px * var(--p))) rotate(calc(8deg * var(--p)));}
-  .stage-caption{left:18px;bottom:18px;}
+  .phones{--pw:260px;--spread:.62;transform:scale(.76);}
+  .stage-caption{left:18px;top:18px;}
   .manifesto{margin-top:72px;}
   .band{padding-bottom:96px;}
   .how-sticky{padding:96px 0 80px;}
