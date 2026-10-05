@@ -22,8 +22,34 @@
   --scrim:rgba(8,11,24,0.5);
   --scrim-strong:rgba(8,11,24,0.85);
   --bezel:#0d0f17;
+  /* Maquette d'iPhone : tranche en titane, île et barre d'état. */
+  --ti-light:#a3a5aa;
+  --ti-mid:#5e6065;
+  --ti-dark:#2a2b30;
+  --ti-glint:rgba(255,255,255,0.32);
+  --island:#000000;
+  /* Haut des écrans du récap, sous la barre d'état : même teinte que l'écran. */
+  --recap-top:#063e88;
+  --recap-top-violet:#423989;
+  --recap-top-night:#03060c;
   --night:#0b0f1e;
   --night-soft:#141a30;
+  /* Carte de « Pendant le voyage » et tracés (rose : le trajet réel, comme dans le récap). */
+  --map-land:#e9e6dd;
+  --map-street:#f8f7f3;
+  --map-road:#ffffff;
+  --map-park:#d4dcc7;
+  --map-water:#c9d6e3;
+  --map-water-ink:#6f86a3;
+  --trail:#d4689a;
+  --traveler:#023e8a;
+  --pin:#46398a;
+  /* Bannière de notification dans l'écran du téléphone (interface claire). */
+  --notif-bg:rgba(246,246,249,0.95);
+  --notif-ink:#12172b;
+  --notif-muted:#5d6584;
+  --shadow-notif:0 10px 30px -12px rgba(8,11,24,0.45);
+  --shadow-card:0 18px 40px -24px rgba(10,14,31,0.45);
   --shadow:0 40px 70px -30px rgba(10,14,31,0.55);
   --ease:cubic-bezier(.16,1,.3,1);
   --font-head:'Poppins',ui-sans-serif,system-ui,sans-serif;
@@ -38,6 +64,15 @@
     --paper:#0b0f1e;
     --surface:#141a30;
     --line:rgba(238,240,247,0.14);
+    --map-land:#111830;
+    --map-street:#1e2746;
+    --map-road:#2a3460;
+    --map-park:#173029;
+    --map-water:#0b1f42;
+    --map-water-ink:#5674a3;
+    --trail:#ef97ba;
+    --traveler:#7fb0ff;
+    --pin:#a79cf2;
   }
 }
 :root[data-theme="dark"]{
@@ -47,6 +82,15 @@
   --paper:#0b0f1e;
   --surface:#141a30;
   --line:rgba(238,240,247,0.14);
+  --map-land:#111830;
+  --map-street:#1e2746;
+  --map-road:#2a3460;
+  --map-park:#173029;
+  --map-water:#0b1f42;
+  --map-water-ink:#5674a3;
+  --trail:#ef97ba;
+  --traveler:#7fb0ff;
+  --pin:#a79cf2;
 }
 
 *{box-sizing:border-box;}
@@ -101,9 +145,7 @@ p{margin:0;}
 .hero-bg{width:100%;height:100%;object-fit:cover;object-position:center 60%;}
 .hero::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,var(--scrim) 0%,rgba(8,11,24,0.1) 38%,var(--scrim-strong) 100%);}
 .hero-body{position:absolute;z-index:2;left:0;right:0;bottom:0;padding-bottom:56px;will-change:transform,opacity;}
-.eyebrow{display:flex;align-items:center;gap:14px;font-size:.78rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--on-photo-soft);}
-.eyebrow::before{content:"";width:40px;height:1px;background:currentColor;}
-.hero h1{font-size:clamp(3.6rem,12.5vw,12rem);font-weight:700;letter-spacing:-0.05em;line-height:.92;margin:28px 0 40px;}
+.hero h1{font-size:clamp(3.6rem,12.5vw,12rem);font-weight:700;letter-spacing:-0.05em;line-height:.92;margin:0 0 40px;}
 .hero h1 .line{display:block;}
 .hero h1 em{font-weight:400;letter-spacing:-0.02em;}
 .hero-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px;align-items:end;padding-top:28px;border-top:1px solid var(--on-photo-line);}
@@ -121,6 +163,28 @@ p{margin:0;}
 .sec-grid h2{font-size:clamp(2.6rem,6.4vw,5.6rem);}
 .sec-grid p{color:var(--muted);font-size:1.1rem;max-width:460px;}
 
+/* ---------- Maquette d'iPhone ----------
+   Tout est proportionnel à --w (largeur de l'appareil) : tranche en titane,
+   bordure noire, écran au format 1320/2868 arrondi à 12,5 % de sa largeur,
+   boutons latéraux. .iphone-chrome ajoute l'île et la barre d'état pour les
+   écrans exportés sans elles ; les captures du simulateur les ont déjà. */
+.iphone{--w:250px;position:relative;flex:none;width:var(--w);padding:calc(var(--w) * .011);border-radius:calc(var(--w) * .15);background:linear-gradient(140deg,var(--ti-light) 0%,var(--ti-mid) 16%,var(--ti-dark) 38%,var(--ti-mid) 62%,var(--ti-light) 84%,var(--ti-mid) 100%);box-shadow:inset 0 0 0 1px var(--ti-glint),var(--shadow);}
+.iphone::before,.iphone::after{content:"";position:absolute;width:calc(var(--w) * .012);}
+/* Bouton Action puis volume +/- à gauche, bouton latéral à droite. */
+.iphone::before{left:calc(var(--w) * -.009);top:15.5%;height:20%;background:linear-gradient(var(--ti-mid),var(--ti-mid)) 0 0/100% 15% no-repeat,linear-gradient(var(--ti-mid),var(--ti-mid)) 0 52%/100% 30% no-repeat,linear-gradient(var(--ti-mid),var(--ti-mid)) 0 100%/100% 30% no-repeat;}
+.iphone::after{right:calc(var(--w) * -.009);top:25%;height:11.5%;background:var(--ti-mid);}
+.iphone-screen{position:relative;box-sizing:content-box;aspect-ratio:1320/2868;border:calc(var(--w) * .022) solid var(--bezel);border-radius:calc(var(--w) * .139);overflow:hidden;background:var(--bezel);}
+.iphone-screen > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top center;}
+.iphone-chrome .iphone-screen{background:var(--recap-top);}
+.iphone-chrome[data-top="violet"] .iphone-screen{background:var(--recap-top-violet);}
+.iphone-chrome[data-top="night"] .iphone-screen{background:var(--recap-top-night);}
+.iphone-chrome .iphone-screen > img{top:5.5%;height:94.5%;}
+.iphone-chrome .iphone-screen::before{content:"";position:absolute;z-index:2;left:50%;top:1.2%;width:28.6%;height:3.9%;border-radius:999px;background:var(--island);transform:translateX(-50%);}
+.iphone-status{position:absolute;z-index:1;left:0;right:0;top:0;height:6.3%;display:flex;align-items:center;justify-content:space-between;padding:0 8.5% 0 11%;color:var(--on-photo);font:600 calc(var(--w) * .052)/1 -apple-system,BlinkMacSystemFont,'SF Pro Text',var(--font-body);letter-spacing:-0.01em;}
+.iphone-status::before{content:"9:41";}
+.iphone-status::after{content:"";width:calc(var(--w) * .2);height:calc(var(--w) * .034);background:currentColor;-webkit-mask:var(--status-icons) no-repeat center/contain;mask:var(--status-icons) no-repeat center/contain;}
+:root{--status-icons:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 78 13'%3E%3Crect x='0' y='8' width='3.2' height='4.4' rx='.9'/%3E%3Crect x='4.8' y='5.8' width='3.2' height='6.6' rx='.9'/%3E%3Crect x='9.6' y='3.4' width='3.2' height='9' rx='.9'/%3E%3Crect x='14.4' y='1' width='3.2' height='11.4' rx='.9'/%3E%3Cpath d='M23.6 4.9a10.4 10.4 0 0 1 14.8 0M26.4 7.8a6.4 6.4 0 0 1 9.2 0' fill='none' stroke='%23000' stroke-width='2.1' stroke-linecap='round'/%3E%3Ccircle cx='31' cy='10.9' r='1.7'/%3E%3Crect x='46.6' y='1' width='24.4' height='11.4' rx='3.4' fill='none' stroke='%23000' stroke-opacity='.4' stroke-width='1.1'/%3E%3Crect x='48.6' y='3' width='17.6' height='7.4' rx='1.8'/%3E%3Crect x='72.4' y='4.6' width='1.7' height='4.2' rx='.85' fill-opacity='.45'/%3E%3C/svg%3E");}
+
 /* Scène : les téléphones posés sur un paysage, comme l'affiche.
    --p (0 → 1) suit le défilement : les téléphones s'écartent en entrant. */
 .stage{--p:1;position:relative;height:min(92vh,820px);min-height:560px;overflow:hidden;background:var(--night);}
@@ -128,11 +192,9 @@ p{margin:0;}
 .stage-media img{width:100%;height:100%;object-fit:cover;}
 .stage::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,11,24,0) 45%,var(--scrim) 100%);pointer-events:none;}
 .phones{position:absolute;z-index:1;left:50%;bottom:0;display:flex;align-items:flex-end;transform:translateX(-50%);}
-.phone{flex:none;width:270px;aspect-ratio:1080/1920;padding:9px;border-radius:40px;background:var(--bezel);box-shadow:var(--shadow);}
-.phone img{width:100%;height:100%;object-fit:cover;border-radius:31px;}
-.phones .phone:nth-child(1){transform:translate(calc(190px - 150px * var(--p)),calc(40px - 70px * var(--p))) rotate(calc(-8deg * var(--p)));}
-.phones .phone:nth-child(2){position:relative;z-index:1;width:310px;transform:translateY(calc(220px - 160px * var(--p)));}
-.phones .phone:nth-child(3){transform:translate(calc(-190px + 150px * var(--p)),calc(40px - 70px * var(--p))) rotate(calc(8deg * var(--p)));}
+.phones .iphone:nth-child(1){transform:translate(calc(190px - 150px * var(--p)),calc(40px - 70px * var(--p))) rotate(calc(-8deg * var(--p)));}
+.phones .iphone:nth-child(2){z-index:1;--w:290px;transform:translateY(calc(220px - 160px * var(--p)));}
+.phones .iphone:nth-child(3){transform:translate(calc(-190px + 150px * var(--p)),calc(40px - 70px * var(--p))) rotate(calc(8deg * var(--p)));}
 .stage-caption{position:absolute;z-index:2;left:32px;bottom:28px;color:var(--on-photo-soft);font-size:.8rem;font-weight:600;letter-spacing:.04em;}
 
 .manifesto{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:64px;margin-top:120px;}
@@ -167,9 +229,8 @@ p{margin:0;}
 .panel-photo:hover > img{transform:scale(1.04);}
 .panel-photo::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,var(--scrim-strong) 0%,var(--scrim) 40%,rgba(8,11,24,0) 70%);}
 .panel-photo > *:not(img){position:relative;z-index:2;}
-.panel .phone{position:absolute;z-index:2;right:36px;bottom:-150px;width:200px;padding:7px;border-radius:30px;transform:rotate(-5deg);transition:transform .9s var(--ease);}
-.panel .phone img{border-radius:24px;}
-.panel:hover .phone{transform:rotate(-2deg) translateY(-14px);}
+.panel .iphone{position:absolute;z-index:2;right:36px;bottom:-190px;--w:200px;transform:rotate(-5deg);transition:transform .9s var(--ease);}
+.panel:hover .iphone{transform:rotate(-2deg) translateY(-14px);}
 .panel-narrow{max-width:52%;}
 .modes{list-style:none;margin:8px 0 0;padding:0;}
 .modes li{display:grid;grid-template-columns:40px 1fr;padding:13px 0;border-top:1px solid var(--on-photo-line);}
@@ -178,6 +239,131 @@ p{margin:0;}
 .modes span{grid-column:2;color:var(--on-photo-soft);font-size:.92rem;}
 .panel-ody{position:absolute;right:30px;top:26px;width:78px;}
 
+/* « Pendant le voyage » : une carte de Lisbonne où le trajet réel quitte le
+   plan. Épinglée et pilotée par le défilement sur grand écran, jouée en
+   boucle ailleurs. Sans animation, on voit directement l'état final. */
+.trip{position:relative;background:var(--paper);}
+.trip-sticky{padding:140px 0;}
+.trip.is-pinned{height:360vh;}
+.trip.is-pinned .trip-sticky{position:sticky;top:0;height:100vh;padding:72px 0 28px;display:flex;flex-direction:column;justify-content:center;}
+.trip.is-pinned .sec-top{margin-bottom:28px;}
+.trip-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:48px;}
+.trip-copy h2{font-size:clamp(2.4rem,4.2vw,3.6rem);margin-bottom:36px;}
+@media (min-width: 1080px){.trip-copy h2{font-size:clamp(2.3rem,3.2vw,3.1rem);margin-bottom:28px;}}
+.trip-steps{list-style:none;margin:0;padding:0;border-bottom:1px solid var(--line);}
+.trip-step{display:grid;grid-template-columns:44px 1fr;padding:14px 0;border-top:1px solid var(--line);position:relative;}
+.trip-step::before{content:"";position:absolute;left:0;right:0;top:-1px;height:1px;background:var(--ink);transform-origin:left;transform:scaleX(0);}
+.trip-step i{font-family:var(--font-accent);font-size:1.15rem;color:var(--muted);}
+.trip-step b{display:block;font-family:var(--font-head);font-weight:500;font-size:1.02rem;letter-spacing:-0.01em;}
+.trip-step span{display:block;color:var(--muted);font-size:.9rem;line-height:1.5;}
+
+/* Carte */
+.trip-map{position:relative;margin:0;border:1px solid var(--line);background:var(--map-land);aspect-ratio:640/600;overflow:hidden;}
+.trip-map > svg{display:block;width:100%;height:100%;}
+.trip-water{fill:var(--map-water);}
+.trip-parks{fill:var(--map-park);}
+.trip-streets{fill:none;stroke:var(--map-street);stroke-width:3;stroke-linecap:round;}
+.trip-roads{fill:none;stroke:var(--map-road);stroke-width:7;stroke-linecap:round;}
+.trip-square{fill:var(--map-road);}
+.trip-places text{font-family:var(--font-accent);font-style:italic;font-size:21px;fill:var(--muted);paint-order:stroke;stroke:var(--map-land);stroke-width:5px;stroke-linejoin:round;}
+.trip-places .trip-river{font-size:30px;fill:var(--map-water-ink);stroke:none;}
+.trip-plan{fill:none;stroke:var(--ink-soft);stroke-width:2.5;stroke-dasharray:7 7;stroke-linecap:round;}
+.trip-trail{fill:none;stroke:var(--trail);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;}
+.trip-stops circle{fill:var(--ink);stroke:var(--map-land);stroke-width:3;}
+.trip-stops text{font:700 12px/1 var(--font-body);fill:var(--paper);text-anchor:middle;}
+.trip-stop-names text{font:600 12.5px/1 var(--font-body);fill:var(--ink-soft);paint-order:stroke;stroke:var(--map-land);stroke-width:4px;stroke-linejoin:round;}
+.trip-ripple{fill:none;stroke:var(--sun);stroke-width:2.5;}
+.trip-dev{fill:none;stroke:var(--sun);stroke-width:2.5;stroke-dasharray:3 3;}
+.trip-pin{transform-box:fill-box;transform-origin:50% 100%;}
+.trip-pin path{stroke:var(--pin);stroke-width:2;}
+.trip-pin rect{fill:var(--map-land);stroke:var(--pin);stroke-width:2;}
+.trip-pin text{font-family:var(--font-accent);font-style:italic;font-size:17px;fill:var(--pin);text-anchor:middle;}
+.trip.is-chosen .trip-pin.is-pick rect{fill:var(--pin);}
+.trip.is-chosen .trip-pin.is-pick text{fill:var(--map-land);}
+.trip.is-chosen .trip-pin:not(.is-pick){opacity:.4;}
+.trip-me-dot{fill:var(--traveler);stroke:var(--on-photo);stroke-width:2.5;}
+.trip-me-pulse{fill:var(--traveler);opacity:0;transform-box:fill-box;transform-origin:center;}
+.trip-legend{position:absolute;right:14px;bottom:12px;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.78rem;font-weight:600;color:var(--ink-soft);}
+.trip-legend > span{display:inline-flex;align-items:center;gap:8px;}
+.trip-legend svg{width:28px;height:4px;overflow:visible;}
+
+/* Téléphone, bannière de notification et propositions d'Ody */
+.trip-phone{position:relative;display:flex;padding-right:min(34%,170px);}
+.trip-phone .iphone{--w:min(230px,52vw);}
+.trip-notif{position:absolute;z-index:3;left:4%;right:4%;top:6.2%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:0 calc(var(--w) * .04);align-items:start;padding:calc(var(--w) * .04);border-radius:calc(var(--w) * .07);background:var(--notif-bg);color:var(--notif-ink);box-shadow:var(--shadow-notif);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);}
+.trip-notif-icon{width:calc(var(--w) * .12);height:calc(var(--w) * .12);border-radius:calc(var(--w) * .028);background:var(--deep);display:grid;place-items:center;}
+.trip-notif-icon img{width:66%;height:auto;}
+.trip-notif-body{display:flex;flex-direction:column;font-size:calc(var(--w) * .047);line-height:1.3;}
+.trip-notif-body b{font-weight:700;}
+.trip-notif-time{font-size:calc(var(--w) * .04);color:var(--notif-muted);}
+.trip-cards{position:absolute;z-index:4;right:0;bottom:9%;width:min(300px,64%);}
+.trip-card{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow-card);}
+.trip-card-head{padding:12px 14px;border-left:3px solid var(--trail);}
+.trip-card-from{display:block;font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.trip-card-head p{font-family:var(--font-head);font-weight:500;font-size:.88rem;line-height:1.3;letter-spacing:-0.01em;}
+.trip-card-list{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;}
+.trip-card-list .trip-card{display:grid;grid-template-columns:24px minmax(0,1fr) auto;align-items:baseline;gap:8px;padding:8px 12px;}
+.trip-card-list i{font-family:var(--font-accent);font-size:1.05rem;color:var(--pin);}
+.trip-card-list b{display:block;font-family:var(--font-head);font-weight:500;font-size:.9rem;line-height:1.25;}
+.trip-card-list span{display:block;font-size:.78rem;color:var(--muted);}
+.trip-card-list em{font-style:normal;font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--trail);opacity:0;}
+.trip.is-chosen .trip-card.is-pick{border-color:var(--pin);}
+.trip.is-chosen .trip-card.is-pick em{opacity:1;}
+.trip.is-chosen .trip-card-list .trip-card:not(.is-pick) > *{opacity:.45;}
+
+@media (min-width: 720px) and (max-width: 1079px){
+  .trip-grid{grid-template-columns:minmax(0,1fr) auto;align-items:center;}
+  .trip-copy{grid-column:1 / -1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:end;}
+  .trip-copy h2{margin-bottom:0;}
+  .trip-phone{padding-right:0;padding-bottom:170px;}
+  .trip-phone .iphone{--w:210px;}
+  .trip-cards{right:-8px;bottom:0;width:260px;}
+}
+@media (min-width: 1080px){
+  .trip-grid{grid-template-columns:minmax(260px,.8fr) minmax(0,1.5fr) auto;align-items:center;gap:44px;}
+  .trip-phone{padding-right:0;}
+  .trip-phone .iphone{--w:min(240px,17vw,calc((100vh - 190px) / 2.24));}
+  .trip-cards{right:-18px;bottom:-9%;width:272px;}
+  .trip.is-pinned .trip-map{width:min(100%,calc((100vh - 190px) * 640 / 600));justify-self:center;}
+}
+@media (max-width: 720px){
+  .trip-sticky{padding:96px 0;}
+  .trip-legend{position:static;padding:10px 12px;border-top:1px solid var(--line);background:var(--paper);}
+  .trip-map{aspect-ratio:auto;}
+  .trip-map > svg{aspect-ratio:640/600;height:auto;}
+}
+
+/* États intermédiaires : uniquement quand l'animation joue. */
+.motion .trip-step{opacity:.38;transition:opacity .5s ease;}
+.motion .trip-step::before{transition:transform .8s var(--ease);}
+.motion .trip-step.is-on{opacity:1;}
+.motion .trip-step.is-on::before{transform:scaleX(1);}
+.motion .trip-me-pulse{animation:trip-pulse 2.2s ease-out infinite;}
+@keyframes trip-pulse{from{opacity:.45;transform:scale(1);}to{opacity:0;transform:scale(3.4);}}
+.motion .trip-dev,.motion .trip-notif,.motion .trip-cards,.motion .trip-card,.motion .trip-card > *,.motion .trip-pin{transition:opacity .5s ease,transform .7s var(--ease),border-color .4s ease,fill .4s ease;}
+.motion .trip-pin{transition-delay:calc(var(--k,0) * 120ms);}
+.motion .trip-card-list .trip-card{transition-delay:calc(120ms + var(--k,0) * 110ms);}
+.motion .trip:not(.is-alert) .trip-dev{opacity:0;}
+.motion .trip:not(.is-alert) .trip-notif{opacity:0;transform:translateY(-130%);}
+.motion .trip:not(.is-ideas) .trip-pin{opacity:0;transform:scale(.2);}
+.motion .trip:not(.is-ideas) .trip-cards{opacity:0;transform:translateY(24px);}
+.motion .trip:not(.is-ideas) .trip-card-list .trip-card{opacity:0;transform:translateX(18px);}
+
+/* Récap : une rangée de téléphones qui glisse avec le défilement sur grand
+   écran, et se fait glisser au doigt ailleurs. */
+.recap{padding-bottom:120px;}
+.recap .sec-grid{margin-bottom:56px;}
+.recap-row{overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;}
+.recap-row::-webkit-scrollbar{display:none;}
+.recap-row.is-linked{overflow-x:clip;}
+.recap-track{display:flex;align-items:flex-start;gap:48px;width:max-content;padding:20px max(32px,calc((100vw - 1320px) / 2 + 32px)) 90px;will-change:transform;}
+.recap-item{flex:none;margin:0;scroll-snap-align:center;}
+.recap-item:nth-child(even){transform:translateY(64px);}
+.recap-item .iphone{--w:236px;}
+.recap-item figcaption{display:flex;gap:12px;align-items:baseline;margin-top:22px;padding-top:12px;border-top:1px solid var(--line);font-size:.88rem;color:var(--muted);}
+.recap-item figcaption i{font-family:var(--font-accent);font-size:1.1rem;color:var(--ink);}
+.recap + .section-facts{padding-top:40px;}
+
 .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;}
 .facts > div{padding-top:20px;border-top:1px solid var(--line);}
 .facts strong{display:block;font-family:var(--font-head);font-weight:500;font-size:clamp(3rem,6vw,5rem);letter-spacing:-0.05em;line-height:1;}
@@ -185,15 +371,21 @@ p{margin:0;}
 
 /* Équipe : une liste, pas des cartes. */
 .crew{position:relative;z-index:0;list-style:none;margin:0;padding:0;border-bottom:1px solid var(--line);}
-.crew li{position:relative;display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:baseline;padding:28px 0;border-top:1px solid var(--line);}
+.crew li{position:relative;border-top:1px solid var(--line);}
+.crew a{display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr) auto;gap:24px;align-items:baseline;padding:28px 0;text-decoration:none;}
+.crew a:focus-visible{outline-offset:-2px;}
 .crew li::before{content:"";position:absolute;inset:0 -32px;background:var(--ink);transform:scaleY(0);transform-origin:bottom;transition:transform .6s var(--ease);z-index:-1;}
 .crew .n{font-family:var(--font-accent);font-style:italic;font-size:1.3rem;color:var(--muted);transition:color .3s ease;}
 .crew .name{font-family:var(--font-head);font-weight:500;font-size:clamp(1.6rem,3.4vw,2.8rem);letter-spacing:-0.035em;line-height:1.05;transition:transform .6s var(--ease),color .3s ease;}
 .crew .role{color:var(--muted);text-align:right;transition:color .3s ease;}
-.crew li:hover::before{transform:scaleY(1);}
-.crew li:hover .name{transform:translateX(16px);color:var(--paper);}
-.crew li:hover .role,.crew li:hover .n{color:var(--paper);}
+.crew-in{display:inline-flex;align-items:center;gap:6px;min-width:96px;justify-content:flex-end;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:color .3s ease;}
+.crew-in svg{width:16px;height:16px;transition:transform .5s var(--ease);}
+.crew li:hover::before,.crew li:focus-within::before{transform:scaleY(1);}
+.crew li:hover .name,.crew li:focus-within .name{transform:translateX(16px);color:var(--paper);}
+.crew li:hover .role,.crew li:hover .n,.crew li:hover .crew-in,.crew li:focus-within .role,.crew li:focus-within .n,.crew li:focus-within .crew-in{color:var(--paper);}
+.crew li:hover .crew-in svg,.crew li:focus-within .crew-in svg{transform:translate(3px,-3px);}
 .crew-foot{margin-top:28px;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;color:var(--muted);font-size:.92rem;}
+.crew-social{display:flex;gap:1.6rem;flex-wrap:wrap;color:var(--ink);}
 
 /* Bêta. */
 .beta{position:relative;color:var(--on-photo);background:var(--night);overflow:hidden;}
@@ -270,9 +462,8 @@ p{margin:0;}
 .motion .line-in.is-in{transform:none;}
 .motion .hero-bg{animation:hero-zoom 2.6s var(--ease) both;}
 @keyframes hero-zoom{from{transform:scale(1.18);}to{transform:scale(1.02);}}
-.motion .hero .eyebrow,.motion .hero-row{opacity:0;transform:translateY(24px);transition:opacity 1s var(--ease) .8s,transform 1.2s var(--ease) .8s;}
-.motion .hero.is-in .eyebrow,.motion .hero.is-in .hero-row{opacity:1;transform:none;}
-.motion .hero.is-in .eyebrow{transition-delay:.15s;}
+.motion .hero-row{opacity:0;transform:translateY(24px);transition:opacity 1s var(--ease) .8s,transform 1.2s var(--ease) .8s;}
+.motion .hero.is-in .hero-row{opacity:1;transform:none;}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1080px){
@@ -292,11 +483,10 @@ p{margin:0;}
   .hero-row{grid-template-columns:1fr;gap:24px;}
   .hero-body{padding-bottom:32px;}
   .stage{height:600px;min-height:0;}
-  .phone{width:180px;border-radius:30px;padding:7px;}
-  .phone img{border-radius:24px;}
-  .phones .phone:nth-child(1){transform:translate(calc(140px - 80px * var(--p)),calc(30px - 40px * var(--p))) rotate(calc(-8deg * var(--p)));}
-  .phones .phone:nth-child(2){width:210px;transform:translateY(calc(160px - 120px * var(--p)));}
-  .phones .phone:nth-child(3){transform:translate(calc(-140px + 80px * var(--p)),calc(30px - 40px * var(--p))) rotate(calc(8deg * var(--p)));}
+  .phones .iphone{--w:168px;}
+  .phones .iphone:nth-child(1){transform:translate(calc(140px - 80px * var(--p)),calc(30px - 40px * var(--p))) rotate(calc(-8deg * var(--p)));}
+  .phones .iphone:nth-child(2){--w:196px;transform:translateY(calc(160px - 120px * var(--p)));}
+  .phones .iphone:nth-child(3){transform:translate(calc(-140px + 80px * var(--p)),calc(30px - 40px * var(--p))) rotate(calc(8deg * var(--p)));}
   .stage-caption{left:18px;bottom:18px;}
   .manifesto{margin-top:72px;}
   .band{padding-bottom:96px;}
@@ -305,11 +495,19 @@ p{margin:0;}
   .how-meta{align-items:flex-start;}
   .how-track{padding:0 18px;gap:14px;scroll-padding:0 18px;}
   .panel{padding:26px;min-height:480px;scroll-snap-align:start;}
-  .panel .phone{width:150px;right:20px;bottom:-100px;}
+  .panel .iphone{--w:150px;right:20px;bottom:-130px;}
   .panel-narrow{max-width:none;}
   .facts{grid-template-columns:1fr 1fr;row-gap:40px;}
-  .crew li{grid-template-columns:44px 1fr;gap:4px 12px;padding:22px 0;}
-  .crew .role{grid-column:2;text-align:left;}
+  .crew a{grid-template-columns:44px minmax(0,1fr) auto;gap:4px 12px;padding:22px 0;}
+  .crew .role{grid-column:2;grid-row:2;text-align:left;}
+  .crew-in{grid-column:3;grid-row:1;min-width:0;font-size:0;}
+  .crew-in svg{width:20px;height:20px;}
+  .recap{padding-bottom:72px;}
+  .recap-track{gap:20px;padding:12px 18px 60px;}
+  .recap-row{scroll-padding:0 18px;}
+  .recap-item{scroll-snap-align:start;}
+  .recap-item:nth-child(even){transform:translateY(36px);}
+  .recap-item .iphone{--w:190px;}
   .beta .wrap{padding-top:96px;padding-bottom:96px;}
   .beta::before{background:linear-gradient(180deg,var(--scrim) 0%,var(--scrim-strong) 100%);}
   .footer-grid{grid-template-columns:1fr;gap:32px;}
@@ -318,7 +516,7 @@ p{margin:0;}
   .legal{padding:48px 18px 96px;}
 }
 @media (prefers-reduced-motion: reduce){
-  .btn .arrow,.panel .phone,.panel-photo > img,.crew li::before,.crew .name{transition:none;}
+  .btn .arrow,.panel .iphone,.panel-photo > img,.crew li::before,.crew .name,.crew-in svg{transition:none;}
 }
 
 /* Piste épinglée : plus compacte pour tenir dans la hauteur de l'écran. */
@@ -330,5 +528,5 @@ p{margin:0;}
 .how.is-pinned .hint-pin{display:inline;}
 .how.is-pinned .hint-swipe{display:none;}
 @media (max-width: 720px){
-  .panel:not(.panel-photo) .phone,.panel-ody{display:none;}
+  .panel:not(.panel-photo) .iphone,.panel-ody{display:none;}
 }

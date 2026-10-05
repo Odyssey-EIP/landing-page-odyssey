@@ -2,6 +2,8 @@
 // - data-fr / data-en : texte de l'élément
 // - data-aria-fr / data-aria-en : aria-label
 // - data-href-fr / data-href-en : lien (mailto pré-rempli dans la bonne langue)
+// - <img data-src-fr data-src-en data-alt-fr data-alt-en> : capture d'écran
+//   et texte alternatif dans la langue choisie
 // - data-lang-block="fr|en" : bloc entier affiché dans une seule langue
 // - <html data-title-fr data-title-en> : titre de l'onglet
 (function(){
@@ -38,6 +40,12 @@
     document.querySelectorAll('[data-href-fr]').forEach(function(el){
       var t = pick(el, 'data-href-', lang);
       if (t !== null) el.setAttribute('href', t);
+    });
+    document.querySelectorAll('img[data-src-fr], img[data-alt-fr]').forEach(function(img){
+      var src = pick(img, 'data-src-', lang);
+      if (src && img.getAttribute('src') !== src) img.setAttribute('src', src);
+      var alt = pick(img, 'data-alt-', lang);
+      if (alt !== null) img.setAttribute('alt', alt);
     });
     document.querySelectorAll('[data-lang-block]').forEach(function(el){
       el.hidden = el.getAttribute('data-lang-block') !== lang;

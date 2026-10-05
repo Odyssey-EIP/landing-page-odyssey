@@ -2,7 +2,10 @@
 // - titres qui montent mot par mot, blocs qui apparaissent au défilement ;
 // - parallaxe des photos, téléphones qui s'écartent en entrant ;
 // - bandeau de destinations qui glisse, piste « Comment ça marche »
-//   épinglée et déroulée à l'horizontale pendant le défilement.
+//   épinglée et déroulée à l'horizontale pendant le défilement ;
+// - rangée du récap qui défile à l'horizontale pendant qu'elle est à l'écran ;
+// - carte « Pendant le voyage » : le voyageur suit le plan, s'en écarte,
+//   reçoit des propositions et en choisit une (défilement ou boucle).
 // Si l'utilisateur demande à réduire les animations, seule la navigation
 // reste dynamique et la piste se fait glisser au doigt.
 (function(){
@@ -15,7 +18,8 @@
   // ---------- Titres découpés en mots ----------
   function splitLeaf(leaf, counter){
     if (leaf.querySelector('.w')) return;
-    var words = leaf.textContent.split(/\s+/).filter(Boolean);
+    // Espaces ordinaires seulement : l'espace insécable reste dans le mot (« programme ? »).
+    var words = leaf.textContent.split(/[ \t\r\n]+/).filter(Boolean);
     leaf.textContent = '';
     words.forEach(function(word, k){
       var w = document.createElement('span');
@@ -85,6 +89,106 @@
   var bar = how && how.querySelector('[data-how-bar]');
   var panels = track ? track.children.length : 0;
   var pinned = false, dist = 0, lastY = window.scrollY, ticking = false;
+  var slide = document.querySelector('[data-slide]');
+  var slideTrack = slide && slide.querySelector('[data-slide-track]');
+  var linked = false, slideDist = 0;
+
+  // ---------- Pendant le voyage ----------
+  // p (0 → 1) raconte la scène : marche sur le plan jusqu'à la ruelle,
+  // écart détecté, propositions, puis la librairie et le château.
+  // Épinglée sur grand écran, jouée en boucle quand elle est visible ailleurs.
+  var trip = document.querySelector('[data-trip]');
+  var tripTrail = trip && trip.querySelector('[data-trip-trail]');
+  var tripMe = trip && trip.querySelector('[data-trip-me]');
+  var tripRipples = trip ? Array.prototype.slice.call(trip.querySelectorAll('[data-trip-ripple]')) : [];
+  var tripSteps = trip ? Array.prototype.slice.call(trip.querySelectorAll('[data-trip-step]')) : [];
+  var tripPinned = false, tripLen = 0, tripDev = 0, tripPick = 0;
+  var tripSeen = false, tripStart = 0, tripRaf = 0;
+  var T = { walk: [0.03, 0.29], alert: 0.31, ideas: 0.46, pick: 0.62, toPick: [0.66, 0.79], toEnd: [0.83, 0.97] };
+  var LOOP = 12000, HOLD = 2600;
+
+  function smooth(k){ return k * k * (3 - 2 * k); }
+  function seg(p, a, b){ return smooth(clamp((p - a) / (b - a))); }
+
+  // Longueur du tracé au point le plus proche de (x, y).
+  function lengthAt(x, y){
+    var best = 0, bestD = Infinity;
+    for (var s = 0; s <= tripLen; s += 1){
+      var pt = tripTrail.getPointAtLength(s);
+      var d = (pt.x - x) * (pt.x - x) + (pt.y - y) * (pt.y - y);
+      if (d < bestD){ bestD = d; best = s; }
+    }
+    return best;
+  }
+
+  function renderTrip(p){
+    var s;
+    if (p < T.toPick[0]) s = tripDev * seg(p, T.walk[0], T.walk[1]);
+    else if (p < T.toEnd[0]) s = tripDev + (tripPick - tripDev) * seg(p, T.toPick[0], T.toPick[1]);
+    else s = tripPick + (tripLen - tripPick) * seg(p, T.toEnd[0], T.toEnd[1]);
+    tripTrail.style.strokeDashoffset = (tripLen - s).toFixed(1);
+    var pt = tripTrail.getPointAtLength(s);
+    tripMe.setAttribute('transform', 'translate(' + pt.x.toFixed(1) + ' ' + pt.y.toFixed(1) + ')');
+
+    // Deux ondes partent du point d'écart.
+    var k = clamp((p - T.alert) / (T.ideas - T.alert));
+    tripRipples.forEach(function(c, i){
+      var q = clamp((k - i * 0.3) / 0.7);
+      c.setAttribute('r', (10 + 46 * q).toFixed(1));
+      c.style.opacity = q > 0 && q < 1 ? (0.9 * (1 - q)).toFixed(3) : '0';
+    });
+
+    var step = p < T.alert ? 1 : p < T.ideas ? 2 : p < T.pick ? 3 : 4;
+    trip.classList.toggle('is-alert', p >= T.alert);
+    trip.classList.toggle('is-ideas', p >= T.ideas);
+    trip.classList.toggle('is-chosen', p >= T.pick);
+    trip.setAttribute('data-step', step);
+    tripSteps.forEach(function(li){ li.classList.toggle('is-on', +li.getAttribute('data-trip-step') === step); });
+  }
+
+  function tripTick(now){
+    tripRaf = 0;
+    if (tripPinned || !tripSeen) return;
+    if (!tripStart) tripStart = now;
+    renderTrip(Math.min(1, ((now - tripStart) % (LOOP + HOLD)) / LOOP));
+    tripRaf = requestAnimationFrame(tripTick);
+  }
+  function tripPlay(){
+    if (!tripRaf && tripSeen && !tripPinned) tripRaf = requestAnimationFrame(tripTick);
+  }
+
+  function tripProgress(){
+    var r = trip.getBoundingClientRect();
+    return clamp(-r.top / Math.max(1, trip.offsetHeight - window.innerHeight));
+  }
+
+  function layoutTrip(){
+    if (!trip || !motion) return;
+    tripPinned = window.innerWidth >= 1080;
+    trip.classList.toggle('is-pinned', tripPinned);
+    if (tripPinned) renderTrip(tripProgress());
+    else if (!tripSeen) renderTrip(0);
+    else tripPlay();
+  }
+
+  if (trip && motion && tripTrail.getTotalLength){
+    tripLen = tripTrail.getTotalLength();
+    var keys = tripTrail.getAttribute('data-keys').split(' ').map(function(k){ return k.split(',').map(Number); });
+    tripDev = lengthAt(keys[0][0], keys[0][1]);
+    tripPick = lengthAt(keys[1][0], keys[1][1]);
+    tripTrail.style.strokeDasharray = tripLen.toFixed(1) + ' ' + tripLen.toFixed(1);
+    // La boucle tourne tant que la scène (carte et téléphone) est à l'écran,
+    // et repart du début quand on y revient.
+    if ('IntersectionObserver' in window){
+      new IntersectionObserver(function(entries){
+        tripSeen = entries[0].isIntersecting;
+        if (!tripSeen){ tripStart = 0; if (tripRaf){ cancelAnimationFrame(tripRaf); tripRaf = 0; } }
+        tripPlay();
+      }, { rootMargin: '-20% 0px -20% 0px' }).observe(trip.querySelector('[data-trip-scene]'));
+    }
+  } else {
+    trip = null;
+  }
 
   function setProgress(p){
     if (!bar) return;
@@ -96,6 +200,8 @@
   // Épingle la piste sur grand écran : la section devient aussi haute
   // que la distance horizontale à parcourir.
   function layout(){
+    layoutSlide();
+    layoutTrip();
     if (!how) return;
     pinned = motion && window.innerWidth > 800;
     how.classList.toggle('is-pinned', pinned);
@@ -106,6 +212,15 @@
     var trackLeft = track.getBoundingClientRect().left;
     dist = Math.max(0, last.getBoundingClientRect().right - trackLeft + padRight - track.clientWidth);
     how.style.height = (window.innerHeight + dist) + 'px';
+  }
+
+  // Rangée du récap : liée au défilement sur grand écran, sinon glissée au doigt.
+  function layoutSlide(){
+    if (!slide) return;
+    linked = motion && window.innerWidth > 800;
+    slide.classList.toggle('is-linked', linked);
+    slideTrack.style.transform = '';
+    slideDist = linked ? Math.max(0, slideTrack.offsetWidth - slide.clientWidth) : 0;
   }
 
   function update(){
@@ -145,6 +260,24 @@
     if (stage){
       var sr = stage.getBoundingClientRect();
       stage.style.setProperty('--p', clamp((vh - sr.top) / (vh * 0.8)).toFixed(3));
+    }
+
+    // La rangée parcourt toute sa largeur pendant qu'elle est entièrement
+    // visible, pour que chaque écran passe en entier devant les yeux.
+    if (linked && slideDist){
+      var lr = slide.getBoundingClientRect();
+      if (lr.bottom > 0 && lr.top < vh){
+        // La piste a ~90 px de marge basse (décalage des téléphones pairs) :
+        // on démarre quand les téléphones sont entrés, on finit avant qu'ils sortent.
+        var span = Math.max(vh - lr.height + 100, vh * 0.3);
+        var lp = clamp((vh - lr.bottom + 90) / span);
+        slideTrack.style.transform = 'translate3d(' + (-lp * slideDist).toFixed(1) + 'px,0,0)';
+      }
+    }
+
+    if (tripPinned){
+      var tr = trip.getBoundingClientRect();
+      if (tr.bottom > 0 && tr.top < vh) renderTrip(tripProgress());
     }
 
     if (band){
