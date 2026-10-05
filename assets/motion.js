@@ -1,14 +1,16 @@
 // Mouvement de la page d'accueil, sans bibliothèque :
 // - titres qui montent mot par mot, blocs qui apparaissent au défilement ;
-// - parallaxe des photos ; éventail de sept téléphones, épinglé sur grand
-//   écran, qui s'ouvre l'un après l'autre puis prend de la profondeur ;
+// - parallaxe des photos ; éventail de sept téléphones, épinglé, qui
+//   s'ouvre l'un après l'autre puis prend de la profondeur ;
 // - bandeau de destinations qui glisse, piste « Comment ça marche »
 //   épinglée et déroulée à l'horizontale pendant le défilement ;
-// - rangée du récap qui défile à l'horizontale pendant qu'elle est à l'écran ;
-// - carte « Pendant le voyage » : le voyageur suit le plan, s'en écarte,
-//   reçoit des propositions et en choisit une (défilement ou boucle).
-// Si l'utilisateur demande à réduire les animations, seule la navigation
-// reste dynamique et la piste se fait glisser au doigt.
+// - rangée du récap qui défile à l'horizontale : pendant qu'elle est à
+//   l'écran sur grand écran, épinglée comme la piste sur petit écran ;
+// - carte « Pendant le voyage », épinglée : le voyageur suit le plan,
+//   s'en écarte, reçoit des propositions et en choisit une.
+// Les mêmes effets tournent sur téléphone, avec des mises en page resserrées
+// (site.css). Si l'utilisateur demande à réduire les animations, seule la
+// navigation reste dynamique et les rangées se font glisser au doigt.
 (function(){
   var root = document.documentElement;
   var motion = root.classList.contains('motion');
@@ -85,19 +87,28 @@
   var band = document.querySelector('[data-band]');
   var parallax = Array.prototype.slice.call(document.querySelectorAll('[data-parallax]'));
   var how = document.querySelector('[data-how]');
+  var howSticky = how && how.querySelector('.how-sticky');
   var track = how && how.querySelector('[data-track]');
   var count = how && how.querySelector('[data-how-count]');
   var bar = how && how.querySelector('[data-how-bar]');
   var panels = track ? track.children.length : 0;
   var pinned = false, dist = 0, lastY = window.scrollY, ticking = false;
   var slide = document.querySelector('[data-slide]');
+  var slideSticky = slide && slide.querySelector('[data-slide-sticky]');
   var slideTrack = slide && slide.querySelector('[data-slide-track]');
-  var linked = false, slideDist = 0;
+  var linked = false, slidePinned = false, slideDist = 0;
+
+  // Les scènes épinglées font 100svh : leur hauteur ne bouge pas quand la
+  // barre du navigateur mobile apparaît ou disparaît. La progression se
+  // calcule sur cette hauteur plutôt que sur innerHeight, qui, elle, varie.
+  function pinProgress(box, sticky){
+    return clamp(-box.getBoundingClientRect().top / Math.max(1, box.offsetHeight - sticky.offsetHeight));
+  }
 
   // ---------- Éventail du projet ----------
   // p (0 → 1) : les téléphones quittent la pile, du centre vers les bords
   // (FAN premiers pourcents), puis la profondeur s'installe et la photo
-  // s'approche. Épinglé dès 900 px, sinon lié à l'entrée dans l'écran.
+  // s'approche. Épinglé dès que le mouvement est permis.
   var stagePin = document.querySelector('[data-stage-pin]');
   var stagePhones = stage && stage.querySelector('.phones');
   var stagePhoto = stage && stage.querySelector('[data-stage-photo]');
@@ -124,9 +135,9 @@
   function stageProgress(vh){
     if (stagePinned){
       // Démarre un peu avant l'épinglage, pendant que la scène entre.
-      var lead = vh * 0.25;
+      var sh = stage.offsetHeight, lead = sh * 0.25;
       var wr = stagePin.getBoundingClientRect();
-      return clamp((lead - wr.top) / Math.max(1, stagePin.offsetHeight - vh + lead));
+      return clamp((lead - wr.top) / Math.max(1, stagePin.offsetHeight - sh + lead));
     }
     var sr = stage.getBoundingClientRect();
     return clamp((vh - sr.bottom + sr.height * 0.75) / (sr.height * 0.75 + vh * 0.5));
@@ -134,24 +145,26 @@
 
   function layoutStage(){
     if (!stagePin || !motion || !slots.length) return;
-    stagePinned = window.innerWidth >= 900;
-    stagePin.classList.toggle('is-pinned', stagePinned);
+    stagePinned = true;
+    stagePin.classList.add('is-pinned');
     stageLast = -1;
   }
 
   // ---------- Pendant le voyage ----------
   // p (0 → 1) raconte la scène : marche sur le plan jusqu'à la ruelle,
   // écart détecté, propositions, puis la librairie et le château.
-  // Épinglée sur grand écran, jouée en boucle quand elle est visible ailleurs.
+  // Épinglée partout ; sous 1080 px, mise en page resserrée (site.css) où la
+  // carte remplit la hauteur restante, rognée plutôt que réduite.
   var trip = document.querySelector('[data-trip]');
+  var tripSticky = trip && trip.querySelector('.trip-sticky');
+  var tripMap = trip && trip.querySelector('[data-trip-map]');
+  var tripSvg = tripMap && tripMap.querySelector('svg');
   var tripTrail = trip && trip.querySelector('[data-trip-trail]');
   var tripMe = trip && trip.querySelector('[data-trip-me]');
   var tripRipples = trip ? Array.prototype.slice.call(trip.querySelectorAll('[data-trip-ripple]')) : [];
   var tripSteps = trip ? Array.prototype.slice.call(trip.querySelectorAll('[data-trip-step]')) : [];
   var tripPinned = false, tripLen = 0, tripDev = 0, tripPick = 0;
-  var tripSeen = false, tripStart = 0, tripRaf = 0;
   var T = { walk: [0.03, 0.29], alert: 0.31, ideas: 0.46, pick: 0.62, toPick: [0.66, 0.79], toEnd: [0.83, 0.97] };
-  var LOOP = 12000, HOLD = 2600;
 
   function smooth(k){ return k * k * (3 - 2 * k); }
   function seg(p, a, b){ return smooth(clamp((p - a) / (b - a))); }
@@ -192,29 +205,17 @@
     tripSteps.forEach(function(li){ li.classList.toggle('is-on', +li.getAttribute('data-trip-step') === step); });
   }
 
-  function tripTick(now){
-    tripRaf = 0;
-    if (tripPinned || !tripSeen) return;
-    if (!tripStart) tripStart = now;
-    renderTrip(Math.min(1, ((now - tripStart) % (LOOP + HOLD)) / LOOP));
-    tripRaf = requestAnimationFrame(tripTick);
-  }
-  function tripPlay(){
-    if (!tripRaf && tripSeen && !tripPinned) tripRaf = requestAnimationFrame(tripTick);
-  }
-
-  function tripProgress(){
-    var r = trip.getBoundingClientRect();
-    return clamp(-r.top / Math.max(1, trip.offsetHeight - window.innerHeight));
-  }
-
   function layoutTrip(){
-    if (!trip || !motion) return;
-    tripPinned = window.innerWidth >= 1080;
-    trip.classList.toggle('is-pinned', tripPinned);
-    if (tripPinned) renderTrip(tripProgress());
-    else if (!tripSeen) renderTrip(0);
-    else tripPlay();
+    if (!trip) return;
+    tripPinned = true;
+    trip.classList.add('is-pinned');
+    var compact = window.innerWidth < 1080;
+    tripSvg.setAttribute('preserveAspectRatio', compact ? 'xMidYMid slice' : 'xMidYMid meet');
+    // Écran large et bas (tablette à l'horizontale) : on limite la largeur
+    // pour que la carte rognée garde le fleuve et le point de départ.
+    tripMap.style.maxWidth = '';
+    if (compact) tripMap.style.maxWidth = Math.round(tripMap.clientHeight * 640 / 600 * 1.25) + 'px';
+    renderTrip(pinProgress(trip, tripSticky));
   }
 
   if (trip && motion && tripTrail.getTotalLength){
@@ -223,15 +224,6 @@
     tripDev = lengthAt(keys[0][0], keys[0][1]);
     tripPick = lengthAt(keys[1][0], keys[1][1]);
     tripTrail.style.strokeDasharray = tripLen.toFixed(1) + ' ' + tripLen.toFixed(1);
-    // La boucle tourne tant que la scène (carte et téléphone) est à l'écran,
-    // et repart du début quand on y revient.
-    if ('IntersectionObserver' in window){
-      new IntersectionObserver(function(entries){
-        tripSeen = entries[0].isIntersecting;
-        if (!tripSeen){ tripStart = 0; if (tripRaf){ cancelAnimationFrame(tripRaf); tripRaf = 0; } }
-        tripPlay();
-      }, { rootMargin: '-20% 0px -20% 0px' }).observe(trip.querySelector('[data-trip-scene]'));
-    }
   } else {
     trip = null;
   }
@@ -243,14 +235,14 @@
     count.textContent = pad(idx) + ' / ' + pad(panels);
   }
 
-  // Épingle la piste sur grand écran : la section devient aussi haute
-  // que la distance horizontale à parcourir.
+  // Épingle la piste : la section devient aussi haute que la distance
+  // horizontale à parcourir.
   function layout(){
     layoutStage();
     layoutSlide();
     layoutTrip();
     if (!how) return;
-    pinned = motion && window.innerWidth > 800;
+    pinned = motion;
     how.classList.toggle('is-pinned', pinned);
     track.style.transform = '';
     if (!pinned){ how.style.height = ''; return; }
@@ -258,16 +250,22 @@
     var padRight = parseFloat(getComputedStyle(track).paddingRight) || 0;
     var trackLeft = track.getBoundingClientRect().left;
     dist = Math.max(0, last.getBoundingClientRect().right - trackLeft + padRight - track.clientWidth);
-    how.style.height = (window.innerHeight + dist) + 'px';
+    how.style.height = (howSticky.offsetHeight + dist) + 'px';
   }
 
-  // Rangée du récap : liée au défilement sur grand écran, sinon glissée au doigt.
+  // Rangée du récap : liée au défilement pendant qu'elle passe sur grand
+  // écran ; sur petit écran, épinglée comme la piste (la rangée devient
+  // aussi haute que la distance à parcourir). Sans mouvement : glissée au doigt.
   function layoutSlide(){
     if (!slide) return;
     linked = motion && window.innerWidth > 800;
+    slidePinned = motion && !linked;
     slide.classList.toggle('is-linked', linked);
+    slide.classList.toggle('is-pinned', slidePinned);
     slideTrack.style.transform = '';
-    slideDist = linked ? Math.max(0, slideTrack.offsetWidth - slide.clientWidth) : 0;
+    slide.style.height = '';
+    slideDist = motion ? Math.max(0, slideTrack.offsetWidth - slide.clientWidth) : 0;
+    if (slidePinned) slide.style.height = (slideSticky.offsetHeight + slideDist) + 'px';
   }
 
   function update(){
@@ -283,8 +281,7 @@
     lastY = y;
 
     if (pinned){
-      var hr = how.getBoundingClientRect();
-      var hp = clamp(-hr.top / Math.max(1, how.offsetHeight - vh));
+      var hp = pinProgress(how, howSticky);
       track.style.transform = 'translate3d(' + (-hp * dist).toFixed(1) + 'px,0,0)';
       setProgress(hp);
     }
@@ -323,10 +320,16 @@
         slideTrack.style.transform = 'translate3d(' + (-lp * slideDist).toFixed(1) + 'px,0,0)';
       }
     }
+    if (slidePinned && slideDist){
+      var pr = slide.getBoundingClientRect();
+      if (pr.bottom > 0 && pr.top < vh){
+        slideTrack.style.transform = 'translate3d(' + (-pinProgress(slide, slideSticky) * slideDist).toFixed(1) + 'px,0,0)';
+      }
+    }
 
     if (tripPinned){
       var tr = trip.getBoundingClientRect();
-      if (tr.bottom > 0 && tr.top < vh) renderTrip(tripProgress());
+      if (tr.bottom > 0 && tr.top < vh) renderTrip(pinProgress(trip, tripSticky));
     }
 
     if (band){
@@ -351,8 +354,20 @@
   }
 
   window.addEventListener('scroll', requestUpdate, { passive: true });
-  window.addEventListener('resize', function(){ layout(); requestUpdate(); });
-  window.addEventListener('load', function(){ layout(); requestUpdate(); });
+  // Sur écran tactile, la barre du navigateur qui se replie change la
+  // hauteur de quelques dizaines de pixels pendant le défilement : on ne
+  // recalcule pas la mise en page pour si peu, sinon tout saute.
+  var touch = window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  var laidW = window.innerWidth, laidH = window.innerHeight;
+  function relayout(){
+    laidW = window.innerWidth; laidH = window.innerHeight;
+    layout(); requestUpdate();
+  }
+  window.addEventListener('resize', function(){
+    if (touch && window.innerWidth === laidW && Math.abs(window.innerHeight - laidH) < 120){ requestUpdate(); return; }
+    relayout();
+  });
+  window.addEventListener('load', relayout);
   layout();
   update();
 })();
