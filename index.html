@@ -22,6 +22,25 @@
 <body>
 <a class="skip" href="#projet" data-fr="Aller au contenu" data-en="Skip to content">Aller au contenu</a>
 
+<!-- ============ ODY, LE GUIDE ============
+     Un seul Ody qui accompagne la visite : il arrive en volant, se pose sur
+     les perchoirs [data-ody-perch] (il y dit data-ody-fr / data-ody-en), vole
+     de l'un à l'autre et de slide en slide dans les défilements horizontaux
+     [data-ody-group]. Un clic ouvre un petit dialogue. Voir assets/ody.js. -->
+<div class="ody ody-guide" data-ody-guide hidden>
+  <p class="ody-say" data-ody-say aria-hidden="true"></p>
+  <div class="ody-menu" id="ody-menu" data-ody-menu role="group" aria-label="Ody" hidden>
+    <p class="ody-menu-title" data-fr="Salut&nbsp;! On va où&nbsp;?" data-en="Hi! Where to?">Salut&nbsp;! On va où&nbsp;?</p>
+    <button type="button" data-ody-go="#projet" data-fr="Voir l'appli" data-en="Show me the app">Voir l'appli</button>
+    <button type="button" data-ody-go="#fonctionnement" data-fr="Comment ça marche&nbsp;?" data-en="How does it work?">Comment ça marche&nbsp;?</button>
+    <button type="button" data-ody-go="#beta" data-fr="Rejoindre la bêta" data-en="Join the beta">Rejoindre la bêta</button>
+    <button type="button" data-ody-joke data-fr="Une blague&nbsp;?" data-en="Tell me a joke">Une blague&nbsp;?</button>
+  </div>
+  <button type="button" class="ody-fig" aria-expanded="false" aria-controls="ody-menu" aria-label="Parler avec Ody, le guide" data-aria-fr="Parler avec Ody, le guide" data-aria-en="Talk to Ody, your guide">
+    <span class="ody-tilt"><span class="ody-body"><img src="assets/img/ody-front.svg" alt="" width="420" height="656" fetchpriority="low" decoding="async"></span></span>
+  </button>
+</div>
+
 <nav class="nav nav-fixed" data-nav aria-label="Navigation principale" data-aria-fr="Navigation principale" data-aria-en="Main navigation">
   <a class="brand" href="#top">
     <img src="assets/img/compass-white.png" alt="" width="30" height="30">
@@ -55,7 +74,7 @@
         <span class="line"><span data-fr="Rêvez," data-en="Dream,">Rêvez,</span> <em data-fr="vivez," data-en="live,">vivez,</em></span>
         <span class="line"><span data-fr="partagez." data-en="share.">partagez.</span></span>
       </h1>
-      <div class="hero-row">
+      <div class="hero-row" data-ody-perch data-ody-fr="Coucou, moi c'est Ody&nbsp;! Je t'accompagne pendant la visite." data-ody-en="Hi, I'm Ody! I'll show you around.">
         <p data-fr="Odyssey compose avec vous des itinéraires sur mesure, jour par jour, puis vous accompagne pendant le voyage. Une application imaginée et développée par six étudiants d'Epitech." data-en="Odyssey builds tailor-made, day-by-day itineraries with you, then stays with you during the trip. An app designed and built by six Epitech students.">Odyssey compose avec vous des itinéraires sur mesure, jour par jour, puis vous accompagne pendant le voyage. Une application imaginée et développée par six étudiants d'Epitech.</p>
         <div class="hero-actions">
           <a class="btn btn-light" href="#beta"><span data-fr="Rejoindre la bêta" data-en="Join the beta">Rejoindre la bêta</span><svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 12h16M14 6l6 6-6 6"/></svg></a>
@@ -80,7 +99,7 @@
         <em data-fr="avec vous," data-en="with you,">avec vous,</em>
         <span data-fr="pas à votre place." data-en="never for you.">pas à votre place.</span>
       </h2>
-      <p class="reveal" style="--d:3" data-fr="Vous racontez votre voyage à Ody, l'assistant d'Odyssey. Il tient compte de vos envies, de votre rythme, de votre budget et de vos contraintes, puis vous propose plusieurs itinéraires à comparer." data-en="You tell Ody, Odyssey's assistant, about your trip. It takes your wishes, pace, budget and constraints into account, then offers several itineraries to compare.">Vous racontez votre voyage à Ody, l'assistant d'Odyssey. Il tient compte de vos envies, de votre rythme, de votre budget et de vos contraintes, puis vous propose plusieurs itinéraires à comparer.</p>
+      <p class="reveal" style="--d:3" data-ody-perch data-ody-fr="Ici, c'est toi qui décides. Moi, je propose des idées." data-ody-en="You decide. I just bring the ideas." data-fr="Vous racontez votre voyage à Ody, l'assistant d'Odyssey. Il tient compte de vos envies, de votre rythme, de votre budget et de vos contraintes, puis vous propose plusieurs itinéraires à comparer." data-en="You tell Ody, Odyssey's assistant, about your trip. It takes your wishes, pace, budget and constraints into account, then offers several itineraries to compare.">Vous racontez votre voyage à Ody, l'assistant d'Odyssey. Il tient compte de vos envies, de votre rythme, de votre budget et de vos contraintes, puis vous propose plusieurs itinéraires à comparer.</p>
     </div>
   </div>
 
@@ -91,7 +110,7 @@
         <div class="slot" style="--i:-3;--a:3" data-slot><div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-generation.webp" data-src-fr="assets/img/ios-generation.webp" data-src-en="assets/img/ios-generation-en.webp" alt="Ody cherche des lieux pour le voyage" data-alt-fr="Ody cherche des lieux pour le voyage" data-alt-en="Ody looking for places for the trip" width="1320" height="2868" loading="lazy"></div></div></div>
         <div class="slot" style="--i:-2;--a:2" data-slot><div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-modes.webp" data-src-fr="assets/img/ios-modes.webp" data-src-en="assets/img/ios-modes-en.webp" alt="Choix du mode : discussion, appel vidéo ou quiz" data-alt-fr="Choix du mode : discussion, appel vidéo ou quiz" data-alt-en="Choosing a mode: chat, video call or quiz" width="1320" height="2868" loading="lazy"></div></div></div>
         <div class="slot" style="--i:-1;--a:1" data-slot><div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-ody.webp" data-src-fr="assets/img/ios-ody.webp" data-src-en="assets/img/ios-ody-en.webp" alt="Conversation avec Ody dans l'application" data-alt-fr="Conversation avec Ody dans l'application" data-alt-en="A conversation with Ody in the app" width="1320" height="2868" loading="lazy"></div></div></div>
-        <div class="slot" style="--i:0;--a:0" data-slot><div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-accueil.webp" data-src-fr="assets/img/ios-accueil.webp" data-src-en="assets/img/ios-accueil-en.webp" alt="Écran d'accueil d'Odyssey" data-alt-fr="Écran d'accueil d'Odyssey" data-alt-en="Odyssey's home screen" width="1320" height="2868" loading="lazy"></div></div></div>
+        <div class="slot" style="--i:0;--a:0" data-slot><div class="iphone" data-ody-perch data-ody-at="center" data-ody-fr="Voilà l'appli&nbsp;! Continue de défiler." data-ody-en="That's the app! Keep scrolling."><div class="iphone-screen"><img src="assets/img/ios-accueil.webp" data-src-fr="assets/img/ios-accueil.webp" data-src-en="assets/img/ios-accueil-en.webp" alt="Écran d'accueil d'Odyssey" data-alt-fr="Écran d'accueil d'Odyssey" data-alt-en="Odyssey's home screen" width="1320" height="2868" loading="lazy"></div></div></div>
         <div class="slot" style="--i:1;--a:1" data-slot><div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-scenario.webp" data-src-fr="assets/img/ios-scenario.webp" data-src-en="assets/img/ios-scenario-en.webp" alt="Un scénario de voyage sur la carte" data-alt-fr="Un scénario de voyage sur la carte" data-alt-en="A travel scenario on the map" width="1320" height="2868" loading="lazy"></div></div></div>
         <div class="slot" style="--i:2;--a:2" data-slot><div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-itineraire.webp" data-src-fr="assets/img/ios-itineraire.webp" data-src-en="assets/img/ios-itineraire-en.webp" alt="L'itinéraire détaillé, heure par heure" data-alt-fr="L'itinéraire détaillé, heure par heure" data-alt-en="The detailed itinerary, hour by hour" width="1320" height="2868" loading="lazy"></div></div></div>
         <div class="slot" style="--i:3;--a:3" data-slot><div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-voyages.webp" data-src-fr="assets/img/ios-voyages.webp" data-src-en="assets/img/ios-voyages-en.webp" alt="Vos voyages et leurs récapitulatifs" data-alt-fr="Vos voyages et leurs récapitulatifs" data-alt-en="Your trips and their recaps" width="1320" height="2868" loading="lazy"></div></div></div>
@@ -103,7 +122,7 @@
   <div class="wrap">
     <div class="manifesto">
       <span class="label reveal"><span class="n">—</span><span data-fr="Pourquoi Odyssey" data-en="Why Odyssey">Pourquoi Odyssey</span></span>
-      <p class="lead reveal" style="--d:1">
+      <p class="lead reveal" style="--d:1" data-ody-perch data-ody-fr="Pas de pub, pas de revente de données. Promis, juré, picoré&nbsp;!" data-ody-en="No ads, no data resale. Cross my feathers!">
         <span data-fr="Les agences vendent des forfaits." data-en="Agencies sell packages.">Les agences vendent des forfaits.</span>
         <span data-fr="Odyssey ne vend rien : l'application suggère, vous décidez, et vous réservez ce que vous voulez, où vous voulez. Sans publicité, sans revente de données." data-en="Odyssey sells nothing: the app suggests, you decide, and you book what you want, where you want. No ads, no data resale.">Odyssey ne vend rien : l'application suggère, vous décidez, et vous réservez ce que vous voulez, où vous voulez. Sans publicité, sans revente de données.</span>
       </p>
@@ -134,22 +153,21 @@
       </div>
     </div>
 
-    <div class="how-track" data-track>
-      <article class="panel panel-top">
+    <div class="how-track" data-track data-ody-group>
+      <article class="panel panel-top" data-ody-perch data-ody-at="inside" data-ody-fr="Écrire, m'appeler ou un quiz&nbsp;: comme tu préfères." data-ody-en="Chat, call me or take a quiz: your choice.">
         <span class="idx">01</span>
-        <img class="panel-ody" src="assets/img/ody.webp" alt="" width="78" height="110" loading="lazy">
         <div class="panel-narrow">
         <h3 data-fr="Trois façons de planifier" data-en="Three ways to plan">Trois façons de planifier</h3>
-        <ul class="modes">
-          <li><i>a.</i><b data-fr="Discuter avec Ody" data-en="Chat with Ody">Discuter avec Ody</b><span data-fr="Décrivez votre voyage avec vos mots, Ody pose les bonnes questions." data-en="Describe your trip in your own words, Ody asks the right questions.">Décrivez votre voyage avec vos mots, Ody pose les bonnes questions.</span></li>
-          <li><i>b.</i><b data-fr="L'appeler" data-en="Call it">L'appeler</b><span data-fr="Un appel vocal, comme avec un ami qui connaît la destination." data-en="A voice call, like talking to a friend who knows the place.">Un appel vocal, comme avec un ami qui connaît la destination.</span></li>
-          <li><i>c.</i><b data-fr="Répondre au quiz" data-en="Take the quiz">Répondre au quiz</b><span data-fr="Pas envie de parler ? Quelques questions guidées suffisent." data-en="Not in the mood to talk? A few guided questions are enough.">Pas envie de parler ? Quelques questions guidées suffisent.</span></li>
+        <ul class="modes" data-ody-for>
+          <li data-ody-mood="talk"><i>a.</i><b data-fr="Discuter avec Ody" data-en="Chat with Ody">Discuter avec Ody</b><span data-fr="Décrivez votre voyage avec vos mots, Ody pose les bonnes questions." data-en="Describe your trip in your own words, Ody asks the right questions.">Décrivez votre voyage avec vos mots, Ody pose les bonnes questions.</span></li>
+          <li data-ody-mood="wave"><i>b.</i><b data-fr="L'appeler" data-en="Call it">L'appeler</b><span data-fr="Un appel vocal, comme avec un ami qui connaît la destination." data-en="A voice call, like talking to a friend who knows the place.">Un appel vocal, comme avec un ami qui connaît la destination.</span></li>
+          <li data-ody-mood="think"><i>c.</i><b data-fr="Répondre au quiz" data-en="Take the quiz">Répondre au quiz</b><span data-fr="Pas envie de parler ? Quelques questions guidées suffisent." data-en="Not in the mood to talk? A few guided questions are enough.">Pas envie de parler ? Quelques questions guidées suffisent.</span></li>
         </ul>
         </div>
         <div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-modes.webp" data-src-fr="assets/img/ios-modes.webp" data-src-en="assets/img/ios-modes-en.webp" alt="Choix du mode : discussion, appel vidéo ou quiz" data-alt-fr="Choix du mode : discussion, appel vidéo ou quiz" data-alt-en="Choosing a mode: chat, video call or quiz" width="1320" height="2868" loading="lazy"></div></div>
       </article>
 
-      <article class="panel panel-photo panel-top">
+      <article class="panel panel-photo panel-top" data-ody-perch data-ody-at="inside" data-ody-fr="Je te prépare plusieurs versions, tu gardes la tienne." data-ody-en="I draft several versions, you keep yours.">
         <img src="assets/img/kyoto-1200.webp" alt="" loading="lazy">
         <span class="idx">02</span>
         <div class="panel-narrow">
@@ -159,7 +177,7 @@
         <div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-generation.webp" data-src-fr="assets/img/ios-generation.webp" data-src-en="assets/img/ios-generation-en.webp" alt="Ody cherche des lieux pour le voyage" data-alt-fr="Ody cherche des lieux pour le voyage" data-alt-en="Ody looking for places for the trip" width="1320" height="2868" loading="lazy"></div></div>
       </article>
 
-      <article class="panel panel-top">
+      <article class="panel panel-top" data-ody-perch data-ody-at="inside" data-ody-fr="Tous tes voyages, rangés au même endroit." data-ody-en="All your trips, neatly in one place.">
         <span class="idx">03</span>
         <div class="panel-narrow">
           <h3 data-fr="Vos voyages, au même endroit" data-en="All your trips, in one place">Vos voyages, au même endroit</h3>
@@ -172,7 +190,7 @@
         <div class="iphone"><div class="iphone-screen"><img src="assets/img/ios-voyages.webp" data-src-fr="assets/img/ios-voyages.webp" data-src-en="assets/img/ios-voyages-en.webp" alt="Vos voyages et leurs récapitulatifs" data-alt-fr="Vos voyages et leurs récapitulatifs" data-alt-en="Your trips and their recaps" width="1320" height="2868" loading="lazy"></div></div>
       </article>
 
-      <article class="panel panel-photo panel-top">
+      <article class="panel panel-photo panel-top" data-ody-perch data-ody-at="inside" data-ody-fr="Un globe rien que pour tes souvenirs&nbsp;!" data-ody-en="A whole globe just for your memories!">
         <img src="assets/img/lake-1400.webp" alt="" loading="lazy">
         <span class="idx">04</span>
         <div class="panel-narrow">
@@ -211,7 +229,7 @@
           </ol>
         </div>
 
-        <figure class="trip-map" data-trip-map>
+        <figure class="trip-map" data-trip-map data-ody-perch data-ody-at="inside" data-ody-fr="Tu sors du plan&nbsp;? Je te trouve des idées juste à côté." data-ody-en="Off the plan? I'll find ideas right around you.">
           <svg viewBox="0 0 640 600" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte du centre de Lisbonne : l'itinéraire prévu en pointillés et, en rose, le trajet réel qui s'en écarte vers une librairie proposée par Ody, puis rejoint le château." data-aria-fr="Carte du centre de Lisbonne : l'itinéraire prévu en pointillés et, en rose, le trajet réel qui s'en écarte vers une librairie proposée par Ody, puis rejoint le château." data-aria-en="Map of central Lisbon: the planned route as a dashed line and, in pink, the actual path that leaves it for a bookshop suggested by Ody, then reaches the castle.">
             <path class="trip-water" d="M0 494 C120 502 220 507 330 500 S520 472 640 454 L640 600 L0 600 Z"/>
             <g class="trip-parks">
@@ -338,34 +356,34 @@
   </div>
   <div class="recap-row" data-slide>
     <div class="recap-sticky" data-slide-sticky>
-    <div class="recap-track" data-slide-track>
+    <div class="recap-track" data-slide-track data-ody-group>
       <figure class="recap-item">
         <div class="iphone iphone-chrome"><div class="iphone-screen"><img src="assets/img/recap-intro.webp" data-src-fr="assets/img/recap-intro.webp" data-src-en="assets/img/recap-intro-en.webp" alt="Récapitulatif : ouverture du voyage" data-alt-fr="Récapitulatif : ouverture du voyage" data-alt-en="Recap: opening screen" width="660" height="1428" loading="lazy"><span class="iphone-status" aria-hidden="true"></span></div></div>
-        <figcaption><i>a.</i><span data-fr="Ouverture" data-en="Opening">Ouverture</span></figcaption>
+        <figcaption data-ody-perch data-ody-fr="À la fin, je te fais un récap de ton voyage." data-ody-en="When it's over, I make you a recap of your trip."><i>a.</i><span data-fr="Ouverture" data-en="Opening">Ouverture</span></figcaption>
       </figure>
       <figure class="recap-item">
         <div class="iphone iphone-chrome"><div class="iphone-screen"><img src="assets/img/recap-km.webp" data-src-fr="assets/img/recap-km.webp" data-src-en="assets/img/recap-km-en.webp" alt="Récapitulatif : 217 km parcourus" data-alt-fr="Récapitulatif : 217 km parcourus" data-alt-en="Recap: 217 km covered" width="660" height="1428" loading="lazy"><span class="iphone-status" aria-hidden="true"></span></div></div>
-        <figcaption><i>b.</i><span data-fr="Distance parcourue" data-en="Distance covered">Distance parcourue</span></figcaption>
+        <figcaption data-ody-perch><i>b.</i><span data-fr="Distance parcourue" data-en="Distance covered">Distance parcourue</span></figcaption>
       </figure>
       <figure class="recap-item">
         <div class="iphone iphone-chrome" data-top="night"><div class="iphone-screen"><img src="assets/img/recap-journees.webp" data-src-fr="assets/img/recap-journees.webp" data-src-en="assets/img/recap-journees-en.webp" alt="Récapitulatif : le plan et les pas sur la carte de Lisbonne" data-alt-fr="Récapitulatif : le plan et les pas sur la carte de Lisbonne" data-alt-en="Recap: the plan and your steps on the map of Lisbon" width="660" height="1428" loading="lazy"><span class="iphone-status" aria-hidden="true"></span></div></div>
-        <figcaption><i>c.</i><span data-fr="Le plan et vos pas" data-en="The plan and your steps">Le plan et vos pas</span></figcaption>
+        <figcaption data-ody-perch><i>c.</i><span data-fr="Le plan et vos pas" data-en="The plan and your steps">Le plan et vos pas</span></figcaption>
       </figure>
       <figure class="recap-item">
         <div class="iphone iphone-chrome"><div class="iphone-screen"><img src="assets/img/recap-plan.webp" data-src-fr="assets/img/recap-plan.webp" data-src-en="assets/img/recap-plan-en.webp" alt="Récapitulatif : 38 % du plan suivi" data-alt-fr="Récapitulatif : 38 % du plan suivi" data-alt-en="Recap: 38% of the plan followed" width="660" height="1428" loading="lazy"><span class="iphone-status" aria-hidden="true"></span></div></div>
-        <figcaption><i>d.</i><span data-fr="Part du plan suivie" data-en="Share of the plan followed">Part du plan suivie</span></figcaption>
+        <figcaption data-ody-perch><i>d.</i><span data-fr="Part du plan suivie" data-en="Share of the plan followed">Part du plan suivie</span></figcaption>
       </figure>
       <figure class="recap-item">
         <div class="iphone iphone-chrome"><div class="iphone-screen"><img src="assets/img/recap-ecart.webp" data-src-fr="assets/img/recap-ecart.webp" data-src-en="assets/img/recap-ecart-en.webp" alt="Récapitulatif : 3,2 km hors du chemin prévu" data-alt-fr="Récapitulatif : 3,2 km hors du chemin prévu" data-alt-en="Recap: 3.2 km off the planned route" width="660" height="1428" loading="lazy"><span class="iphone-status" aria-hidden="true"></span></div></div>
-        <figcaption><i>e.</i><span data-fr="Le plus grand écart" data-en="The biggest detour">Le plus grand écart</span></figcaption>
+        <figcaption data-ody-perch><i>e.</i><span data-fr="Le plus grand écart" data-en="The biggest detour">Le plus grand écart</span></figcaption>
       </figure>
       <figure class="recap-item">
         <div class="iphone iphone-chrome" data-top="night"><div class="iphone-screen"><img src="assets/img/recap-photos.webp" data-src-fr="assets/img/recap-photos.webp" data-src-en="assets/img/recap-photos-en.webp" alt="Récapitulatif : 148 photos du voyage" data-alt-fr="Récapitulatif : 148 photos du voyage" data-alt-en="Recap: 148 photos from the trip" width="660" height="1428" loading="lazy"><span class="iphone-status" aria-hidden="true"></span></div></div>
-        <figcaption><i>f.</i><span data-fr="Les photos du voyage" data-en="Trip photos">Les photos du voyage</span></figcaption>
+        <figcaption data-ody-perch><i>f.</i><span data-fr="Les photos du voyage" data-en="Trip photos">Les photos du voyage</span></figcaption>
       </figure>
       <figure class="recap-item">
         <div class="iphone iphone-chrome" data-top="night"><div class="iphone-screen"><img src="assets/img/recap-carte.webp" data-src-fr="assets/img/recap-carte.webp" data-src-en="assets/img/recap-carte-en.webp" alt="Récapitulatif : la carte souvenir" data-alt-fr="Récapitulatif : la carte souvenir" data-alt-en="Recap: the keepsake card" width="660" height="1428" loading="lazy"><span class="iphone-status" aria-hidden="true"></span></div></div>
-        <figcaption><i>g.</i><span data-fr="La carte souvenir" data-en="The keepsake card">La carte souvenir</span></figcaption>
+        <figcaption data-ody-perch data-ody-fr="Et une carte souvenir à partager&nbsp;!" data-ody-en="And a keepsake card to share!"><i>g.</i><span data-fr="La carte souvenir" data-en="The keepsake card">La carte souvenir</span></figcaption>
       </figure>
     </div>
     </div>
@@ -379,7 +397,7 @@
       <div class="reveal"><strong>3</strong><span data-fr="façons de planifier" data-en="ways to plan">façons de planifier</span></div>
       <div class="reveal" style="--d:1"><strong>6</strong><span data-fr="étudiants d'Epitech" data-en="Epitech students">étudiants d'Epitech</span></div>
       <div class="reveal" style="--d:2"><strong>0</strong><span data-fr="publicité" data-en="ads">publicité</span></div>
-      <div class="reveal" style="--d:3"><strong>2</strong><span data-fr="plateformes, iOS et Android" data-en="platforms, iOS and Android">plateformes, iOS et Android</span></div>
+      <div class="reveal" style="--d:3" data-ody-perch data-ody-fr="Six humains… et un perroquet." data-ody-en="Six humans… and one parrot."><strong>2</strong><span data-fr="plateformes, iOS et Android" data-en="platforms, iOS and Android">plateformes, iOS et Android</span></div>
     </div>
   </div>
 </section>
@@ -396,7 +414,7 @@
         <span data-fr="Six étudiants," data-en="Six students,">Six étudiants,</span>
         <em data-fr="un même cap." data-en="one heading.">un même cap.</em>
       </h2>
-      <p class="reveal" style="--d:3" data-fr="Odyssey est notre projet de fin de cursus à Epitech (EIP), commencé en février 2025. Nous le concevons, le développons et le testons nous-mêmes." data-en="Odyssey is our final-year project at Epitech (EIP), started in February 2025. We design, build and test it ourselves.">Odyssey est notre projet de fin de cursus à Epitech (EIP), commencé en février 2025. Nous le concevons, le développons et le testons nous-mêmes.</p>
+      <p class="reveal" style="--d:3" data-ody-perch data-ody-mood="wave" data-ody-fr="Voici mon équipage&nbsp;! Dis-leur bonjour." data-ody-en="Meet my crew! Say hi." data-fr="Odyssey est notre projet de fin de cursus à Epitech (EIP), commencé en février 2025. Nous le concevons, le développons et le testons nous-mêmes." data-en="Odyssey is our final-year project at Epitech (EIP), started in February 2025. We design, build and test it ourselves.">Odyssey est notre projet de fin de cursus à Epitech (EIP), commencé en février 2025. Nous le concevons, le développons et le testons nous-mêmes.</p>
     </div>
 
     <ol class="crew">
@@ -432,7 +450,7 @@
         <p class="beta-intro reveal" style="--d:2" data-fr="On cherche des voyageurs pour tester Odyssey avant sa sortie, et nous dire ce qui marche, ce qui coince et ce qui manque." data-en="We're looking for travelers to try Odyssey before launch and tell us what works, what breaks and what's missing.">On cherche des voyageurs pour tester Odyssey avant sa sortie, et nous dire ce qui marche, ce qui coince et ce qui manque.</p>
       </div>
 
-      <div class="beta-panel">
+      <div class="beta-panel" data-ody-perch data-ody-mood="happy" data-ody-fr="Psst… il reste de la place à bord. Demande ton accès&nbsp;!" data-ody-en="Psst… there's still room on board. Request your access!">
         <ol class="steps">
           <li class="reveal"><div><strong data-fr="Demandez votre accès" data-en="Request access">Demandez votre accès</strong><span data-fr="Dites-nous si vous avez un iPhone ou un Android, avec l'adresse e-mail de votre compte Google Play ou Apple." data-en="Tell us whether you have an iPhone or an Android, with the email address of your Google Play or Apple account.">Dites-nous si vous avez un iPhone ou un Android, avec l'adresse e-mail de votre compte Google Play ou Apple.</span></div></li>
           <li class="reveal" style="--d:1"><div><strong data-fr="On vous ajoute" data-en="We add you">On vous ajoute</strong><span data-fr="Nous inscrivons votre adresse sur la liste des testeurs et vous répondons par e-mail." data-en="We add your address to the tester list and reply by email.">Nous inscrivons votre adresse sur la liste des testeurs et vous répondons par e-mail.</span></div></li>
@@ -440,7 +458,7 @@
         </ol>
 
         <div class="beta-actions reveal" style="--d:3">
-          <a class="btn btn-light"
+          <a class="btn btn-light" data-ody-cheer
              href="mailto:odyssey.eip@gmail.com?subject=Rejoindre%20la%20b%C3%AAta%20Odyssey&amp;body=Bonjour%2C%0A%0AJe%20souhaite%20rejoindre%20la%20b%C3%AAta%20d'Odyssey.%0AMon%20t%C3%A9l%C3%A9phone%20%28iPhone%20ou%20Android%29%20%3A%20%0AAdresse%20e-mail%20%28Gmail%20de%20Google%20Play%2C%20ou%20celle%20de%20mon%20compte%20Apple%29%20%3A%20%0A%0AMerci%20%21"
              data-href-fr="mailto:odyssey.eip@gmail.com?subject=Rejoindre%20la%20b%C3%AAta%20Odyssey&amp;body=Bonjour%2C%0A%0AJe%20souhaite%20rejoindre%20la%20b%C3%AAta%20d'Odyssey.%0AMon%20t%C3%A9l%C3%A9phone%20%28iPhone%20ou%20Android%29%20%3A%20%0AAdresse%20e-mail%20%28Gmail%20de%20Google%20Play%2C%20ou%20celle%20de%20mon%20compte%20Apple%29%20%3A%20%0A%0AMerci%20%21"
              data-href-en="mailto:odyssey.eip@gmail.com?subject=Join%20the%20Odyssey%20beta&amp;body=Hello%2C%0A%0AI'd%20like%20to%20join%20the%20Odyssey%20beta.%0AMy%20phone%20%28iPhone%20or%20Android%29%3A%20%0AEmail%20address%20%28Gmail%20for%20Google%20Play%2C%20or%20my%20Apple%20Account%20email%29%3A%20%0A%0AThanks%21">
@@ -464,7 +482,7 @@
 <footer class="footer">
   <div class="wrap">
     <p class="footer-word split" aria-hidden="true"><span data-fr="Bon" data-en="Bon">Bon</span> <em data-fr="voyage." data-en="voyage.">voyage.</em></p>
-    <div class="footer-grid">
+    <div class="footer-grid" data-ody-perch data-ody-mood="wave" data-ody-fr="Bon voyage&nbsp;! Reviens me voir." data-ody-en="Bon voyage! Come back soon.">
       <div>
         <a class="brand" href="#top"><img src="assets/img/compass-white.png" alt="" width="30" height="30"><span>Odyssey</span></a>
         <p class="footer-tag" data-fr="Une application de voyage qui compose avec vous des itinéraires sur mesure. Projet étudiant Epitech, en bêta." data-en="A travel app that builds tailor-made itineraries with you. An Epitech student project, in beta.">Une application de voyage qui compose avec vous des itinéraires sur mesure. Projet étudiant Epitech, en bêta.</p>
@@ -507,5 +525,6 @@
 
 <script src="assets/site.js"></script>
 <script src="assets/motion.js"></script>
+<script src="assets/ody.js"></script>
 </body>
 </html>
