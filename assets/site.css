@@ -478,7 +478,7 @@ p{margin:0;}
    demandé à réduire les animations : sans JS, la page reste lisible. */
 .motion .reveal{opacity:0;transform:translateY(48px);transition:opacity 1s var(--ease),transform 1.2s var(--ease);transition-delay:calc(var(--d,0) * 90ms);}
 .motion .reveal.is-in{opacity:1;transform:none;}
-.motion .split .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.12em;margin-bottom:-.12em;}
+.motion .split .w{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.22em;margin-bottom:-.22em;}
 .motion .split .w > span{display:inline-block;transform:translateY(110%);transition:transform 1.1s var(--ease);transition-delay:calc(var(--i,0) * 55ms);}
 .motion .split.is-in .w > span{transform:none;}
 .motion .clip{clip-path:inset(14% 10% 14% 10%);transition:clip-path 1.5s var(--ease);}
