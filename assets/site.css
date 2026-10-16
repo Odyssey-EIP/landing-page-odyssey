@@ -258,7 +258,6 @@ p{margin:0;}
 .modes i{font-family:var(--font-accent);color:var(--on-photo-soft);}
 .modes b{font-family:var(--font-head);font-weight:500;}
 .modes span{grid-column:2;color:var(--on-photo-soft);font-size:.92rem;}
-.panel-ody{position:absolute;right:30px;top:26px;width:78px;}
 
 /* « Pendant le voyage » : une carte de Lisbonne où le trajet réel quitte le
    plan. Épinglée et pilotée par le défilement (version resserrée sous
@@ -567,7 +566,7 @@ p{margin:0;}
 .how.is-pinned .hint-pin{display:inline;}
 .how.is-pinned .hint-swipe{display:none;}
 @media (max-width: 720px){
-  .panel:not(.panel-photo) .iphone,.panel-ody{display:none;}
+  .panel:not(.panel-photo) .iphone{display:none;}
 }
 
 /* ---------- Petits écrans : mêmes scènes épinglées, resserrées ----------
@@ -638,4 +637,105 @@ p{margin:0;}
 @media (max-width: 1079px) and (max-height: 700px){
   .trip.is-pinned .sec-top .aside{display:none;}
   .trip.is-pinned .trip-copy h2{font-size:clamp(1.4rem,6vw,2rem);}
+}
+
+/* ---------- Ody, le guide ----------
+   Un seul Ody, en position fixe : ody.js le pose sur les perchoirs
+   [data-ody-perch] et le fait voler de l'un à l'autre (transform posé en
+   ligne sur .ody-guide). Le dessin (assets/img/ody-front.svg) est inséré en
+   ligne pour animer ses parties : .o-crest, .o-wing-l, .o-wing-r, .o-look
+   (regard, via --lx/--ly), .o-eye, .o-brow, .o-jaw, .o-cheeks.
+   Une couche de mouvement par élément, pour qu'elles ne se battent pas :
+   .ody-guide position · .ody-fig flottement · .ody-tilt inclinaison en vol ·
+   .ody-body sauts · .ody-svg penché. Humeurs sur .ody-guide : is-wave,
+   is-talk, is-think, is-happy, is-flying. Toujours posé sur fond sombre ou
+   sur papier : l'ombre portée le détache dans les deux thèmes. */
+.ody-guide{--ody-w:clamp(62px,5.4vw,84px);position:fixed;left:0;top:0;z-index:30;width:var(--ody-w);pointer-events:none;opacity:0;transition:opacity .4s ease;}
+.ody-guide.is-ready{opacity:1;}
+.ody-guide:not(.is-ready) .ody-fig{pointer-events:none;}
+.ody-guide[hidden]{display:none;}
+.ody-fig{display:block;width:100%;margin:0;padding:0;border:0;background:none;color:inherit;pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.ody-fig:focus-visible{outline:2px solid var(--sun);outline-offset:6px;border-radius:14px;}
+.ody-tilt{display:block;transform:rotate(var(--tilt,0deg));transform-origin:50% 55%;transition:transform .4s var(--ease);}
+.ody-body{display:block;position:relative;aspect-ratio:420 / 656;transform-origin:50% 100%;}
+.ody-body > img,.ody-svg{position:absolute;inset:0;display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 12px 14px rgba(4,6,16,0.45));}
+.ody-body > img{object-fit:contain;object-position:bottom center;}
+.ody-svg{transform-origin:50% 90%;transition:transform .6s var(--ease);}
+.ody-svg g{transform-box:fill-box;}
+.ody-svg .o-crest{transform-origin:62% 100%;}
+.ody-svg .o-wing-l{transform-origin:92% 12%;}
+.ody-svg .o-wing-r{transform-origin:15% 5%;}
+.ody-svg .o-eye{transform-origin:50% 50%;}
+.ody-svg .o-jaw{transform-origin:50% 0;}
+.ody-svg .o-cheeks{transform-origin:50% 50%;}
+.ody-svg .o-look{transform:translate(calc(var(--lx,0) * 10px),calc(var(--ly,0) * 7px));transition:transform .35s var(--ease);}
+.ody-svg .o-brow,.ody-svg .o-cheeks,.ody-svg .o-jaw{transition:transform .35s var(--ease);}
+
+/* Bulles : à gauche d'Ody par défaut ; ody.js choisit .is-right, .is-up
+   (au-dessus) ou .is-low (plus bas) pour ne pas couvrir de texte. */
+.ody-say,.ody-menu{position:absolute;right:calc(100% + 6px);bottom:56%;width:max-content;max-width:min(13rem,calc(100vw - var(--ody-w) - 40px));margin:0;padding:10px 15px;background:var(--on-photo);color:#12172b;border-radius:18px 18px 4px 18px;font-size:.86rem;font-weight:600;line-height:1.4;box-shadow:var(--shadow-card);transform-origin:bottom right;}
+.ody-guide.is-right .ody-say,.ody-guide.is-right .ody-menu{right:auto;left:calc(100% + 6px);border-radius:18px 18px 18px 4px;transform-origin:bottom left;}
+.ody-guide.is-low .ody-say,.ody-guide.is-low .ody-menu{bottom:auto;top:40%;border-radius:4px 18px 18px 18px;transform-origin:top right;}
+.ody-guide.is-low.is-right .ody-say,.ody-guide.is-low.is-right .ody-menu{border-radius:18px 4px 18px 18px;}
+.ody-guide.is-up .ody-say,.ody-guide.is-up .ody-menu{right:0;left:auto;top:auto;bottom:calc(100% + 6px);border-radius:18px 18px 4px 18px;transform-origin:bottom right;}
+.ody-say{pointer-events:none;opacity:0;transform:translateY(8px) scale(.88);transition:opacity .25s ease,transform .45s var(--ease);}
+.ody-say.is-on{opacity:1;transform:none;}
+.ody-menu{pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px 14px 12px;}
+.ody-menu[hidden]{display:none;}
+.ody-menu-title{margin:0 2px 4px;font-size:.92rem;}
+.ody-menu button{appearance:none;margin:0;padding:.45rem .95rem;border:1px solid rgba(18,23,43,0.18);border-radius:999px;background:none;color:#12172b;font:600 .82rem/1.2 var(--font-body);cursor:pointer;text-align:left;transition:background-color .2s ease,color .2s ease;}
+.ody-menu button:hover,.ody-menu button:focus-visible{background:#12172b;color:#fff;}
+.ody-guide.is-menu .ody-say{opacity:0;}
+
+.modes li b{transition:color .3s ease;}
+.modes li.is-ody b{color:var(--sun);}
+/* Place réservée au-dessus du panneau pour qu'Ody s'y pose sans rien couvrir */
+.beta-panel{margin-top:140px;}
+
+/* Humeurs (sans animation, elles restent lisibles : sourcils, joues, bec) */
+.ody-guide.is-think .ody-svg{transform:rotate(-8deg);}
+.ody-guide.is-think .o-brow-r{transform:translateY(-9px) rotate(-6deg);}
+.ody-guide.is-happy .o-brow,.ody-guide.is-wave .o-brow{transform:translateY(-6px);}
+.ody-guide.is-happy .o-cheeks{transform:scale(1.25);}
+.ody-guide.is-talk .o-jaw,.ody-guide.is-happy .o-jaw,.ody-guide.is-menu .o-jaw{transform:translateY(7px);}
+
+/* Mouvement */
+.motion .ody-fig{animation:ody-float 5.2s ease-in-out infinite alternate;}
+.motion .ody-svg .o-crest{animation:o-sway 3.4s ease-in-out infinite alternate;}
+.motion .ody-svg .o-wing-l{animation:o-flap 2.6s ease-in-out infinite alternate;}
+.motion .ody-svg .o-wing-r{animation:o-flap-r 2.9s ease-in-out infinite alternate;}
+.motion .ody-svg .o-eye{animation:o-blink 4.8s linear infinite;animation-delay:var(--blink,0s);}
+.motion .ody-guide.is-wave .o-wing-l{animation:o-wave .3s ease-in-out infinite alternate;}
+.motion .ody-guide.is-happy .o-wing-l{animation:o-wave .22s ease-in-out infinite alternate;}
+.motion .ody-guide.is-happy .o-wing-r{animation:o-wave-r .22s ease-in-out infinite alternate;}
+.motion .ody-guide.is-happy .ody-body{animation:o-bounce .44s ease-in-out infinite;}
+.motion .ody-guide.is-happy .o-crest{animation-duration:.3s;}
+.motion .ody-guide.is-talk .o-jaw{animation:o-talk .18s ease-in-out infinite alternate;}
+.motion .ody-guide.is-flying .ody-fig{animation:none;}
+.motion .ody-guide.is-flying .o-wing-l{animation:o-wave .14s ease-in-out infinite alternate;}
+.motion .ody-guide.is-flying .o-wing-r{animation:o-wave-r .14s ease-in-out infinite alternate;}
+.motion .ody-guide.is-flying .o-crest{animation:o-sway .5s ease-in-out infinite alternate;}
+.motion .ody-body.is-hop{animation:o-hop .5s var(--ease);}
+.motion .ody-body.is-land{animation:o-land .45s var(--ease);}
+.motion .ody-body.is-spin{transform-origin:50% 55%;animation:o-spin .9s var(--ease);}
+.motion .ody-fig:hover .ody-svg{transform:rotate(4deg) scale(1.04);}
+.motion .ody-guide.is-asleep *{animation-play-state:paused !important;}
+@keyframes ody-float{from{transform:translateY(0) rotate(-1.5deg);}to{transform:translateY(-8px) rotate(1.5deg);}}
+@keyframes o-sway{from{transform:rotate(-4deg);}to{transform:rotate(4deg);}}
+@keyframes o-flap{from{transform:rotate(-3deg);}to{transform:rotate(7deg);}}
+@keyframes o-flap-r{from{transform:rotate(3deg);}to{transform:rotate(-7deg);}}
+@keyframes o-blink{0%,93%,100%{transform:none;}96%{transform:scaleY(.08);}}
+@keyframes o-wave{from{transform:rotate(2deg);}to{transform:rotate(34deg);}}
+@keyframes o-wave-r{from{transform:rotate(-2deg);}to{transform:rotate(-26deg);}}
+@keyframes o-talk{from{transform:none;}to{transform:translateY(10px);}}
+@keyframes o-bounce{0%,100%{transform:none;}50%{transform:translateY(-9%) scaleY(1.03);}}
+@keyframes o-hop{0%{transform:none;}30%{transform:translateY(2%) scaleY(.92) scaleX(1.06);}60%{transform:translateY(-14%) scaleY(1.05);}100%{transform:none;}}
+@keyframes o-land{0%{transform:none;}35%{transform:scaleY(.88) scaleX(1.08);}70%{transform:scaleY(1.04) scaleX(.98);}100%{transform:none;}}
+@keyframes o-spin{0%{transform:none;}40%{transform:translateY(-22%) rotate(200deg);}100%{transform:rotate(360deg);}}
+
+@media (max-width: 720px){
+  .ody-guide{--ody-w:50px;}
+  .beta-panel{margin-top:96px;}
+  .ody-say,.ody-menu{font-size:.8rem;padding:9px 13px;}
+  .ody-menu{padding:12px 12px 10px;}
 }
