@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 2048 2048">
-<title>Odyssey</title>
+<title>Ody</title>
 <defs><clipPath id="ody-logo-clip"><rect width="2048" height="2048" rx="456"/></clipPath></defs>
 <g clip-path="url(#ody-logo-clip)">
 <rect width="2048" height="2048" fill="#152545"/>
