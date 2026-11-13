@@ -172,7 +172,8 @@
     var center = at === 'center';
     var inGroup = !!el.closest('[data-ody-group]');
     var start = center ? r.left + r.width / 2 - W / 2 : r.right - W - Math.min(24, r.width * 0.06);
-    var minX = Math.max(8, r.left), maxX = Math.min(vw - W - 8, r.right - W);
+    var wide = r.width > vw - 16;
+    var minX = wide ? Math.max(8, r.left) : r.left, maxX = wide ? Math.min(vw - W - 8, r.right - W) : r.right - W;
     var scope = el.closest('section, header, footer') || document.body;
     // Dedans : debout dans le coin haut droit de l'élément (un panneau)
     if (at === 'inside'){
@@ -212,10 +213,16 @@
     return spot;
   }
 
-  function perchPos(el){
+  function spotXY(el){
     var r = el.getBoundingClientRect();
-    var spot = spotOf(el, r) || { dx: r.width - W, dy: -H + 4 };
-    return clampPos(r.left + spot.dx, r.top + spot.dy);
+    var at = el.getAttribute('data-ody-at') || '';
+    var spot = spotOf(el, r);
+    var pos = spot || (at === 'inside' ? { dx: r.width - W - 16, dy: 12 } : { dx: r.width - W, dy: -H + 4 });
+    return { x: r.left + pos.dx, y: r.top + pos.dy, free: !!spot };
+  }
+  function perchPos(el){
+    var p = spotXY(el);
+    return { x: p.x, y: p.y };
   }
   // Sans perchoir à l'écran : un coin libre de texte (bas droit, bas gauche,
   // haut droit, haut gauche) ; à défaut, il passe la tête depuis le bord droit.
@@ -245,30 +252,37 @@
     };
   }
 
-  // Le perchoir le plus en vue : son bord haut dans la bande centrale de
-  // l'écran et le plus proche d'un point de mire ; on garde l'actuel tant
-  // qu'un autre n'est pas nettement mieux placé.
+  // Le perchoir le plus en vue : on vérifie la vraie position d'Ody (pas
+  // seulement le bord de l'élément) pour éviter qu'il se colle au bord et
+  // glisse au lieu de voler, et sans redescendre en bas à droite entre deux.
   function choose(){
     var vw = window.innerWidth, vh = window.innerHeight;
-    var ranked = [];
-    perches.forEach(function(el){
-      var r = el.getBoundingClientRect();
-      if (!r.width || r.top < vh * 0.14 || r.top > vh * 0.84) return;
-      if (r.right < W || r.left > vw - W) return;
-      var px = el.getAttribute('data-ody-at') === 'center' ? r.left + r.width / 2 : r.right - W / 2;
-      if (px < 0 || px > vw) return;
-      ranked.push({ el: el, r: r, score: Math.abs(r.top - vh * 0.45) + Math.abs(px - vw * 0.55) * 0.7 });
-    });
-    ranked.sort(function(a, b){ return a.score - b.score; });
-    var curScore = Infinity, best = null;
-    for (var i = 0; i < ranked.length; i++){
-      if (spotOf(ranked[i].el, ranked[i].r) === null) continue;
-      if (!best) best = ranked[i];
-      if (ranked[i].el === current){ curScore = ranked[i].score; break; }
+    function pickIn(minX, maxX, minY, maxY, requireFree){
+      var ranked = [];
+      perches.forEach(function(el){
+        var r = el.getBoundingClientRect();
+        if (!r.width) return;
+        var p = spotXY(el);
+        if (requireFree && !p.free) return;
+        if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) return;
+        var cx = p.x + W / 2, cy = p.y + H / 2;
+        ranked.push({ el: el, score: Math.abs(cy - vh * 0.42) + Math.abs(cx - vw * 0.55) * 0.7 });
+      });
+      ranked.sort(function(a, b){ return a.score - b.score; });
+      if (!ranked.length) return null;
+      var curScore = Infinity;
+      for (var i = 0; i < ranked.length; i++){
+        if (ranked[i].el === current){ curScore = ranked[i].score; break; }
+      }
+      if (ranked[0].el !== current && curScore < Infinity && ranked[0].score > curScore - 70) return current;
+      return ranked[0].el;
     }
-    if (!best) return 'dock';
-    if (best.el !== current && curScore < Infinity && best.score > curScore - 70) return current;
-    return best.el;
+
+    var hit = pickIn(12, vw - W - 12, 68, vh - H - 12, true)
+           || pickIn(0, vw - W, 12, vh - H - 4, true);
+    if (hit) return hit;
+    if (current && current !== 'dock') return current;
+    return pickIn(-vw, vw * 2, -vh, vh * 2, false) || 'dock';
   }
 
   // ---- Vol ----
@@ -290,11 +304,14 @@
   function takeOff(next, now, duration){
     current = next;
     if (!motion){ land(); return; }
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var x0 = duration ? pos.x : Math.max(-W - 20, Math.min(vw + 20, pos.x));
+    var y0 = duration ? pos.y : Math.max(-H - 20, Math.min(vh + 20, pos.y));
     var t = targetOf(next);
-    var dx = t.x - pos.x, dy = t.y - pos.y;
+    var dx = t.x - x0, dy = t.y - y0;
     var dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < 6){ land(); return; }
-    flight = { x0: pos.x, y0: pos.y, t0: now, d: duration || Math.max(650, Math.min(1500, dist * 1.3)), bob: Math.min(12, 3 + dist * 0.015), beats: Math.max(2, Math.round(dist / 160)) };
+    flight = { x0: x0, y0: y0, t0: now, d: duration || Math.max(650, Math.min(1500, dist * 1.3)), bob: Math.min(12, 3 + dist * 0.015), beats: Math.max(2, Math.round(dist / 160)) };
     guide.classList.add('is-flying');
     guide.style.setProperty('--tilt', (Math.max(-1, Math.min(1, dx / 300)) * 14).toFixed(1) + 'deg');
     guide.style.setProperty('--lx', dx > 0 ? '1' : '-1');
@@ -327,7 +344,7 @@
   function frame(now){
     if (started && !document.hidden){
       if (!W) measure();
-      if (now - lastChoice > 120 || current === null){
+      if (current === null || (!flight && now - lastChoice > 120)){
         lastChoice = now;
         var next = choose();
         if (next !== current) takeOff(next, now, current === null ? 2600 : 0);
@@ -401,10 +418,10 @@
   function openMenu(byKeyboard){
     hush();
     menu.hidden = false;
-    guide.classList.add('is-menu');
     fig.setAttribute('aria-expanded', 'true');
     openedAt = window.scrollY;
     placeBubble(menu, false);
+    guide.classList.add('is-menu');
     replay('is-hop');
     var first = menu.querySelector('button');
     if (byKeyboard && first) first.focus();

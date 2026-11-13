@@ -674,16 +674,20 @@ p{margin:0;}
 
 /* Bulles : à gauche d'Ody par défaut ; ody.js choisit .is-right, .is-up
    (au-dessus) ou .is-low (plus bas) pour ne pas couvrir de texte. */
-.ody-say,.ody-menu{position:absolute;right:calc(100% + 6px);bottom:56%;width:max-content;max-width:min(13rem,calc(100vw - var(--ody-w) - 40px));margin:0;padding:10px 15px;background:var(--on-photo);color:#12172b;border-radius:18px 18px 4px 18px;font-size:.86rem;font-weight:600;line-height:1.4;box-shadow:var(--shadow-card);transform-origin:bottom right;}
+.ody-say,.ody-menu{position:absolute;right:calc(100% + 6px);bottom:56%;width:max-content;max-width:min(13rem,calc(100vw - var(--ody-w) - 40px));margin:0;padding:10px 15px;background:rgba(248,248,252,0.72);-webkit-backdrop-filter:blur(18px) saturate(1.3);backdrop-filter:blur(18px) saturate(1.3);border:1px solid rgba(255,255,255,0.45);color:#12172b;border-radius:18px 18px 4px 18px;font-size:.86rem;font-weight:600;line-height:1.4;box-shadow:var(--shadow-card);transform-origin:bottom right;}
 .ody-guide.is-right .ody-say,.ody-guide.is-right .ody-menu{right:auto;left:calc(100% + 6px);border-radius:18px 18px 18px 4px;transform-origin:bottom left;}
 .ody-guide.is-low .ody-say,.ody-guide.is-low .ody-menu{bottom:auto;top:40%;border-radius:4px 18px 18px 18px;transform-origin:top right;}
-.ody-guide.is-low.is-right .ody-say,.ody-guide.is-low.is-right .ody-menu{border-radius:18px 4px 18px 18px;}
+.ody-guide.is-low.is-right .ody-say,.ody-guide.is-low.is-right .ody-menu{border-radius:18px 4px 18px 18px;transform-origin:top left;}
 .ody-guide.is-up .ody-say,.ody-guide.is-up .ody-menu{right:0;left:auto;top:auto;bottom:calc(100% + 6px);border-radius:18px 18px 4px 18px;transform-origin:bottom right;}
 .ody-say{pointer-events:none;opacity:0;transform:translateY(8px) scale(.88);transition:opacity .25s ease,transform .45s var(--ease);}
 .ody-say.is-on{opacity:1;transform:none;}
 .ody-menu{pointer-events:auto;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px 14px 12px;}
 .ody-menu[hidden]{display:none;}
-.ody-menu-title{margin:0 2px 4px;font-size:.92rem;}
+.motion .ody-guide.is-menu .ody-menu{animation:ody-bubble-pop .42s cubic-bezier(.34,1.56,.64,1) both;}
+@keyframes ody-bubble-pop{0%{opacity:0;transform:scale(.22);}100%{opacity:1;transform:scale(1);}}
+.ody-menu-title{margin:0 2px 4px;font-size:.96rem;line-height:1.25;}
+.ody-menu-title strong{font-family:var(--font-head);font-weight:700;}
+.ody-menu-title em{font-family:var(--font-accent);font-style:italic;font-weight:400;font-size:1.18em;letter-spacing:-0.01em;}
 .ody-menu button{appearance:none;margin:0;padding:.45rem .95rem;border:1px solid rgba(18,23,43,0.18);border-radius:999px;background:none;color:#12172b;font:600 .82rem/1.2 var(--font-body);cursor:pointer;text-align:left;transition:background-color .2s ease,color .2s ease;}
 .ody-menu button:hover,.ody-menu button:focus-visible{background:#12172b;color:#fff;}
 .ody-guide.is-menu .ody-say{opacity:0;}
