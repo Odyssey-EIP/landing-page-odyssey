@@ -449,7 +449,18 @@
     if (refocus) fig.focus();
   }
 
+  // Mode clavier : le contour de focus d'Ody ne s'affiche que si l'on
+  // navigue au clavier ; un clic souris relâche le focus.
+  var keyboard = false;
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Tab' || e.key === 'Enter' || e.key === ' ' || e.key.indexOf('Arrow') === 0){
+      keyboard = true; root.classList.add('ody-kbd');
+    }
+  }, true);
+  document.addEventListener('pointerdown', function(){ keyboard = false; root.classList.remove('ody-kbd'); }, true);
+
   fig.addEventListener('click', function(e){
+    if (e.detail > 0) fig.blur();
     clicks++;
     if (clicks % 5 === 0){
       closeMenu();
@@ -488,7 +499,7 @@
   });
 
   document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape' && !menu.hidden) closeMenu(true);
+    if (e.key === 'Escape' && !menu.hidden) closeMenu(keyboard);
   });
   document.addEventListener('pointerdown', function(e){
     if (!menu.hidden && !guide.contains(e.target)) closeMenu(false);
