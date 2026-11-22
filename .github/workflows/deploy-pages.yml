@@ -10,9 +10,10 @@ permissions:
   pages: write
   id-token: write
 
+# Un nouveau push annule le déploiement en cours : seule la dernière version part.
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
@@ -20,6 +21,11 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      # Facultatif : pour vider aussi le cache Cloudflare à chaque déploiement,
+      # ajouter ces deux secrets au dépôt (Settings > Secrets and variables > Actions).
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CF_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,12 +33,35 @@ jobs:
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      # .git et .github sont exclus automatiquement de l'artefact
+      # Le site est reconstruit de zéro dans _site, puis chaque lien vers
+      # assets/ (CSS, JS, images, dessin d'Ody, polices) reçoit la version du
+      # commit (?v=…). À chaque déploiement, navigateurs et Cloudflare voient
+      # donc de nouvelles adresses et ne resservent plus les anciens fichiers,
+      # gardés sinon jusqu'à 4 h en cache.
+      - name: Build
+        run: |
+          rm -rf _site
+          mkdir _site
+          rsync -a --exclude '.git' --exclude '.github' --exclude '.claude' --exclude '_site' ./ _site/
+          V="${GITHUB_SHA::8}"
+          find _site -name '*.html' -print0 | xargs -0 perl -pi -e "s#(assets/[A-Za-z0-9_./-]+\.(?:css|js|svg|png|webp|jpe?g|woff2|ttf))(?![?A-Za-z0-9_./-])#\$1?v=$V#g"
+          perl -pi -e "s#url\((fonts/[^)?\"']+)\)#url(\$1?v=$V)#g" _site/assets/site.css
+          echo "Version $V"
+          grep -o 'assets/site.css?v=[a-z0-9]*' _site/index.html
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .
+          path: _site
 
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
+      - name: Purge Cloudflare cache
+        if: ${{ env.CF_API_TOKEN != '' && env.CF_ZONE_ID != '' }}
+        run: |
+          curl -fsS -X POST "https://api.cloudflare.com/client/v4/zones/$CF_ZONE_ID/purge_cache" \
+            -H "Authorization: Bearer $CF_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"purge_everything":true}'
