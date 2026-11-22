@@ -5,7 +5,7 @@
 //   (il avance, puis descend petit à petit).
 //   Sans perchoir à l'écran, il attend dans le coin bas droit.
 // - [data-ody-perch] : un perchoir. data-ody-fr / data-ody-en : ce qu'il y dit
-//   en arrivant ; data-ody-at="center" : posé au milieu plutôt qu'à droite ;
+//   en arrivant (une fois par visite) ; data-ody-at="center" : posé au milieu plutôt qu'à droite ;
 //   data-ody-mood="wave|happy|talk|think" : son humeur à l'arrivée.
 // - [data-ody-group] : défilement horizontal ; Ody vole de slide en slide.
 // - Clic : un petit dialogue (aller à une section, une blague) ; tous les
@@ -89,10 +89,11 @@
   function speak(text, ms, announce){
     if (!text) return;
     say.textContent = text;
+    // Une réplique automatique ne s'affiche que si elle ne couvre aucun texte.
+    if (!placeBubble(say, true) && !announce) return;
     // Les répliques automatiques ne sont pas lues ; celles demandées, si.
     if (announce){ say.removeAttribute('aria-hidden'); say.setAttribute('role', 'status'); }
     else { say.setAttribute('aria-hidden', 'true'); say.removeAttribute('role'); }
-    placeBubble(say, true);
     say.classList.add('is-on');
     clearTimeout(sayTimer);
     sayTimer = setTimeout(hush, ms || 3800);
@@ -100,7 +101,8 @@
   function hush(){ say.classList.remove('is-on'); }
 
   // La bulle se met du côté où elle ne couvre pas de texte : à gauche, à
-  // droite, puis au-dessus d'Ody ; à défaut, du premier côté qui tient à l'écran.
+  // droite, puis au-dessus d'Ody ; à défaut, du premier côté qui tient à
+  // l'écran (renvoie alors false).
   var SIDES = [['is-left'], ['is-right'], ['is-up'], ['is-right', 'is-low'], ['is-left', 'is-low']];
   function placeBubble(el, avoidText){
     var vw = window.innerWidth, vh = window.innerHeight;
@@ -111,14 +113,15 @@
       var r = el.getBoundingClientRect();
       if (r.left < 4 || r.right > vw - 4 || r.top < 64 || r.bottom > vh - 4) continue;
       if (!fallback) fallback = SIDES[i];
-      if (!avoidText) return;
+      if (!avoidText) return true;
       var boxes = textBoxes(scope, r.top, r.bottom), hit = false;
       for (var j = 0; j < boxes.length && !hit; j++){
         hit = boxes[j].right > r.left && boxes[j].left < r.right;
       }
-      if (!hit) return;
+      if (!hit) return true;
     }
     setSide(fallback || SIDES[0]);
+    return false;
   }
   function setSide(classes){
     ['is-left', 'is-right', 'is-up', 'is-low'].forEach(function(c){ guide.classList.toggle(c, classes.indexOf(c) !== -1); });
@@ -172,7 +175,8 @@
     var center = at === 'center';
     var inGroup = !!el.closest('[data-ody-group]');
     var start = center ? r.left + r.width / 2 - W / 2 : r.right - W - Math.min(24, r.width * 0.06);
-    var minX = Math.max(8, r.left), maxX = Math.min(vw - W - 8, r.right - W);
+    var wide = r.width > vw - 16;
+    var minX = wide ? Math.max(8, r.left) : r.left, maxX = wide ? Math.min(vw - W - 8, r.right - W) : r.right - W;
     var scope = el.closest('section, header, footer') || document.body;
     // Dedans : debout dans le coin haut droit de l'élément (un panneau)
     if (at === 'inside'){
@@ -212,10 +216,16 @@
     return spot;
   }
 
-  function perchPos(el){
+  function spotXY(el){
     var r = el.getBoundingClientRect();
-    var spot = spotOf(el, r) || { dx: r.width - W, dy: -H + 4 };
-    return clampPos(r.left + spot.dx, r.top + spot.dy);
+    var at = el.getAttribute('data-ody-at') || '';
+    var spot = spotOf(el, r);
+    var pos = spot || (at === 'inside' ? { dx: r.width - W - 16, dy: 12 } : { dx: r.width - W, dy: -H + 4 });
+    return { x: r.left + pos.dx, y: r.top + pos.dy, free: !!spot };
+  }
+  function perchPos(el){
+    var p = spotXY(el);
+    return { x: p.x, y: p.y };
   }
   // Sans perchoir à l'écran : un coin libre de texte (bas droit, bas gauche,
   // haut droit, haut gauche) ; à défaut, il passe la tête depuis le bord droit.
@@ -245,30 +255,37 @@
     };
   }
 
-  // Le perchoir le plus en vue : son bord haut dans la bande centrale de
-  // l'écran et le plus proche d'un point de mire ; on garde l'actuel tant
-  // qu'un autre n'est pas nettement mieux placé.
+  // Le perchoir le plus en vue : on vérifie la vraie position d'Ody (pas
+  // seulement le bord de l'élément) pour éviter qu'il se colle au bord et
+  // glisse au lieu de voler, et sans redescendre en bas à droite entre deux.
   function choose(){
     var vw = window.innerWidth, vh = window.innerHeight;
-    var ranked = [];
-    perches.forEach(function(el){
-      var r = el.getBoundingClientRect();
-      if (!r.width || r.top < vh * 0.14 || r.top > vh * 0.84) return;
-      if (r.right < W || r.left > vw - W) return;
-      var px = el.getAttribute('data-ody-at') === 'center' ? r.left + r.width / 2 : r.right - W / 2;
-      if (px < 0 || px > vw) return;
-      ranked.push({ el: el, r: r, score: Math.abs(r.top - vh * 0.45) + Math.abs(px - vw * 0.55) * 0.7 });
-    });
-    ranked.sort(function(a, b){ return a.score - b.score; });
-    var curScore = Infinity, best = null;
-    for (var i = 0; i < ranked.length; i++){
-      if (spotOf(ranked[i].el, ranked[i].r) === null) continue;
-      if (!best) best = ranked[i];
-      if (ranked[i].el === current){ curScore = ranked[i].score; break; }
+    function pickIn(minX, maxX, minY, maxY, requireFree){
+      var ranked = [];
+      perches.forEach(function(el){
+        var r = el.getBoundingClientRect();
+        if (!r.width) return;
+        var p = spotXY(el);
+        if (requireFree && !p.free) return;
+        if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) return;
+        var cx = p.x + W / 2, cy = p.y + H / 2;
+        ranked.push({ el: el, score: Math.abs(cy - vh * 0.42) + Math.abs(cx - vw * 0.55) * 0.7 });
+      });
+      ranked.sort(function(a, b){ return a.score - b.score; });
+      if (!ranked.length) return null;
+      var curScore = Infinity;
+      for (var i = 0; i < ranked.length; i++){
+        if (ranked[i].el === current){ curScore = ranked[i].score; break; }
+      }
+      if (ranked[0].el !== current && curScore < Infinity && ranked[0].score > curScore - 70) return current;
+      return ranked[0].el;
     }
-    if (!best) return 'dock';
-    if (best.el !== current && curScore < Infinity && best.score > curScore - 70) return current;
-    return best.el;
+
+    var hit = pickIn(12, vw - W - 12, 68, vh - H - 12, true)
+           || pickIn(0, vw - W, 12, vh - H - 4, true);
+    if (hit) return hit;
+    if (current && current !== 'dock') return current;
+    return pickIn(-vw, vw * 2, -vh, vh * 2, false) || 'dock';
   }
 
   // ---- Vol ----
@@ -277,6 +294,16 @@
   var pos = { x: -200, y: Math.max(70, window.innerHeight * 0.1) };
   var current = null, flight = null, started = false, lastChoice = 0;
   var said = typeof Map === 'function' ? new Map() : null;
+  // Discret : il change de perchoir une fois le défilement arrêté (sauf si
+  // le sien sort de l'écran) et ne parle pas plus d'une fois toutes les 15 s.
+  var lastScrollAt = -1e9, lastSpoke = -1e9;
+  var QUIET = 15000, SETTLE = 260;
+  window.addEventListener('scroll', function(){ lastScrollAt = performance.now(); }, { passive: true });
+  function onScreen(el){
+    if (!el || el === 'dock') return false;
+    var r = el.getBoundingClientRect();
+    return r.bottom > 0 && r.top < window.innerHeight && r.right > 0 && r.left < window.innerWidth;
+  }
   measure();
   pos.x = -W - 60;
   place(pos.x, pos.y);
@@ -290,11 +317,14 @@
   function takeOff(next, now, duration){
     current = next;
     if (!motion){ land(); return; }
+    var vw = window.innerWidth, vh = window.innerHeight;
+    var x0 = duration ? pos.x : Math.max(-W - 20, Math.min(vw + 20, pos.x));
+    var y0 = duration ? pos.y : Math.max(-H - 20, Math.min(vh + 20, pos.y));
     var t = targetOf(next);
-    var dx = t.x - pos.x, dy = t.y - pos.y;
+    var dx = t.x - x0, dy = t.y - y0;
     var dist = Math.sqrt(dx * dx + dy * dy);
     if (dist < 6){ land(); return; }
-    flight = { x0: pos.x, y0: pos.y, t0: now, d: duration || Math.max(650, Math.min(1500, dist * 1.3)), bob: Math.min(12, 3 + dist * 0.015), beats: Math.max(2, Math.round(dist / 160)) };
+    flight = { x0: x0, y0: y0, t0: now, d: duration || Math.max(650, Math.min(1500, dist * 1.3)), bob: Math.min(12, 3 + dist * 0.015), beats: Math.max(2, Math.round(dist / 160)) };
     guide.classList.add('is-flying');
     guide.style.setProperty('--tilt', (Math.max(-1, Math.min(1, dx / 300)) * 14).toFixed(1) + 'deg');
     guide.style.setProperty('--lx', dx > 0 ? '1' : '-1');
@@ -310,10 +340,12 @@
     replay('is-land');
     var text = current.getAttribute('data-ody-' + lang());
     var mood = current.getAttribute('data-ody-mood');
-    var last = said ? said.get(current) : 0;
     var now = Date.now();
-    if (text && menu.hidden && (!last || now - last > 30000)){
+    // Chaque réplique ne sort qu'une fois par visite, et jamais trop près
+    // de la précédente.
+    if (text && menu.hidden && !(said && said.has(current)) && now - lastSpoke > QUIET){
       if (said) said.set(current, now);
+      lastSpoke = now;
       setTimeout(function(){ speak(text, 3600 + text.length * 25); }, motion ? 180 : 0);
       moodFor(mood ? 'is-' + mood : 'is-talk', mood ? 1600 : 1100);
     }
@@ -327,10 +359,11 @@
   function frame(now){
     if (started && !document.hidden){
       if (!W) measure();
-      if (now - lastChoice > 120 || current === null){
+      if (current === null || (!flight && now - lastChoice > 120)){
         lastChoice = now;
         var next = choose();
-        if (next !== current) takeOff(next, now, current === null ? 2600 : 0);
+        var settled = now - lastScrollAt > SETTLE;
+        if (next !== current && (current === null || settled || !onScreen(current))) takeOff(next, now, current === null ? 2600 : 0);
       }
       var t = targetOf(current);
       if (flight){
@@ -378,22 +411,21 @@
     }, { passive: true });
   }
 
-  // De temps en temps, Ody salue ou bavarde tout seul ; sur tactile, il
-  // regarde aussi autour de lui.
+  // De temps en temps (rarement), Ody fait un petit geste tout seul ; sur
+  // tactile, il regarde aussi autour de lui.
   if (motion){
     setTimeout(function tick(){
       if (started && !flight && !held && menu.hidden && !document.hidden){
         var r = Math.random();
-        if (r < 0.35) moodFor('is-wave', 1300);
-        else if (r < 0.55) moodFor('is-talk', 900);
-        else if (r < 0.65) replay('is-hop');
+        if (r < 0.2) moodFor('is-wave', 1200);
+        else if (r < 0.32) replay('is-hop');
         if (!mouse){
           guide.style.setProperty('--lx', (Math.random() * 1.6 - 0.8).toFixed(2));
           guide.style.setProperty('--ly', (Math.random() * 1.0 - 0.4).toFixed(2));
         }
       }
-      setTimeout(tick, 4200 + Math.random() * 5200);
-    }, 6000);
+      setTimeout(tick, 9000 + Math.random() * 8000);
+    }, 9000);
   }
 
   // ---- Dialogue ----
@@ -401,10 +433,10 @@
   function openMenu(byKeyboard){
     hush();
     menu.hidden = false;
-    guide.classList.add('is-menu');
     fig.setAttribute('aria-expanded', 'true');
     openedAt = window.scrollY;
     placeBubble(menu, false);
+    guide.classList.add('is-menu');
     replay('is-hop');
     var first = menu.querySelector('button');
     if (byKeyboard && first) first.focus();
@@ -417,7 +449,18 @@
     if (refocus) fig.focus();
   }
 
+  // Mode clavier : le contour de focus d'Ody ne s'affiche que si l'on
+  // navigue au clavier ; un clic souris relâche le focus.
+  var keyboard = false;
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Tab' || e.key === 'Enter' || e.key === ' ' || e.key.indexOf('Arrow') === 0){
+      keyboard = true; root.classList.add('ody-kbd');
+    }
+  }, true);
+  document.addEventListener('pointerdown', function(){ keyboard = false; root.classList.remove('ody-kbd'); }, true);
+
   fig.addEventListener('click', function(e){
+    if (e.detail > 0) fig.blur();
     clicks++;
     if (clicks % 5 === 0){
       closeMenu();
@@ -456,7 +499,7 @@
   });
 
   document.addEventListener('keydown', function(e){
-    if (e.key === 'Escape' && !menu.hidden) closeMenu(true);
+    if (e.key === 'Escape' && !menu.hidden) closeMenu(keyboard);
   });
   document.addEventListener('pointerdown', function(e){
     if (!menu.hidden && !guide.contains(e.target)) closeMenu(false);
